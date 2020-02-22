@@ -1,0 +1,27 @@
+.editor-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.e-buttons {
+    position: absolute;
+    bottom: 1rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 95%;
+    max-width: 400px;
+    min-width: fit-content;
+    height: 3rem;
+    z-index: 1;
+}
+
+.e-button {
+    height: 1rem;
+    padding: 5px;
+    cursor: pointer;
+}
