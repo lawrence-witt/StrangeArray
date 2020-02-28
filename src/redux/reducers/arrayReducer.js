@@ -1,4 +1,4 @@
-import { ADD_TO_ARRAY, UPDATE_PATH } from '../actions/types';
+import { ADD_TO_ARRAY, DELETE_FROM_ARRAY, UPDATE_PATH } from '../actions/types';
 
 const initialState = {
     //userArray: [1, 2, [3, [4, 5, 6, [7, 8, [9, 10]]]]],
@@ -11,12 +11,16 @@ const initialState = {
     //userArray: [],
     currentPath: [],
     dimensions: 6
-
 };
 
 export default function(state = initialState, action) {
     switch(action.type) {
         case ADD_TO_ARRAY:
+            return {
+                ...state,
+                userArray: action.payload
+            }
+        case DELETE_FROM_ARRAY:
             return {
                 ...state,
                 userArray: action.payload

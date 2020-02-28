@@ -123,9 +123,9 @@ const Scene = props => {
         <Provider store={store}>
                 <ConnectedCubeGroup 
                 groupArray={currentArray}
-                path={'base'}
+                path={['base']}
                 depth={0}
-                currentFieldPaths={['base']}
+                currentFieldPaths={[['base']]}
 
                 position={masterBasePosition}
                 size={baseSize}

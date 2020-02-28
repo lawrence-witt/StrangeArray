@@ -8,10 +8,11 @@ import * as THREE from 'three';
 
 // Imported Sheets
 import { usePrevious } from '../../utils/CustomHooks';
+import { deleteFromArray } from '../../redux/actions/arrayActions';
 
 const ArrayCube = props => {
     let { position, size, opacity, path, depth, selectionHandler, selected } = props;
-    let { dimensions, activeFieldElements, topFieldLayer } = props;
+    let { dimensions, activeFieldElements, topFieldLayer, deleteFromArray, deletionActive} = props;
 
     // Geometry Config
     const cubeVertices = [[-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, 0.5], [0.5, 0.5, 0.5]];
@@ -27,15 +28,24 @@ const ArrayCube = props => {
     const appliedWallF = useMemo(() => wallFaces.map(f => new THREE.Face3(...f)), []);
     const appliedFloorF = useMemo(() => floorFaces.map(f => new THREE.Face3(...f)), []);
 
-    // Respond to Redux Changes
+
+    /* RESPOND TO REDUX CHANGES */
+    const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
+    const inTopField = useMemo(() => topFieldLayer.some(el => el.join(',') === path.join(',')), [topFieldLayer]);
+
     const [activityState, setActivityState] = useState('collapsed')
     const [relativeStrength, setRelativeStrength] = useState(0);
 
+    // The simplest way to fix this transition might be to let the array cube control its own selected state. It doesn't actually use the parent select for anything.
     useEffect(() => {
-        activeFieldElements.includes(path) ?
+        inTopField ? 
+            setActivityState('focussed') :
+        inActiveField && selected ?
             setActivityState('expanded') :
+        inActiveField && !inTopField ?
+            setActivityState('overriden') :
             setActivityState('collapsed');
-    }, [activeFieldElements, topFieldLayer]);
+    }, [inActiveField, inTopField, selected]);
 
     useEffect(() => {
         const newStrength = 1 - (1/dimensions)*depth === 0 ? 10 :
@@ -43,7 +53,8 @@ const ArrayCube = props => {
         setRelativeStrength(newStrength);
     }, [dimensions]);
 
-    // Respond to Parent Changes
+
+    /* RESPOND TO PARENT CHANGES */
     const [cubePosition, setCubePosition] = useState(position);
     const [cubeSize, setCubeSize] = useState(size);
     
@@ -52,21 +63,29 @@ const ArrayCube = props => {
         setCubeSize(size);
     }, [position, size]); 
 
-    // Pass action to Parent
-    const toggleExpansion = e => {
-        e.stopPropagation();
-        selectionHandler();
+
+    /* RESPOND TO CLICK EVENT */
+    const arrayClickHandler = e => {
+        if(deletionActive && inTopField) {
+            e.stopPropagation();
+            deleteFromArray(path);
+        } else if (deletionActive) {
+            e.stopPropagation();
+        } else if (inActiveField) {
+            e.stopPropagation();
+            selectionHandler();
+        }
     }
 
     // Animate Changes
     const aProps = useSpring({
         cPosition: cubePosition,
         cSize: cubeSize,
-        cOpacity: opacity
+        cOpacity: activityState === 'overriden' ? 0.3 : opacity
     });
 
     return (
-        <a.mesh position={aProps.cPosition} scale={aProps.cSize} onClick={e => toggleExpansion(e)}>
+        <a.instancedMesh position={aProps.cPosition} scale={aProps.cSize} onClick={e => arrayClickHandler(e)}>
             <mesh>
                 <geometry attach="geometry" vertices={vertices} faces={appliedFloorF} onUpdate={self => self.computeFaceNormals()}/>
                 <a.meshPhongMaterial attach="material" color="grey" transparent opacity={aProps.cOpacity} side={THREE.FrontSide} />
@@ -79,11 +98,13 @@ const ArrayCube = props => {
                 <geometry attach="geometry" vertices={vertices} faces={appliedFloorF} onUpdate={self => self.computeFaceNormals()}/>
                 <a.meshPhongMaterial attach="material" color="grey" transparent opacity={aProps.cOpacity} side={THREE.BackSide} />
             </mesh>
-        </a.mesh>
+        </a.instancedMesh>
     )
 }
 
 const mapStateToProps = state => ({
+    deletionActive: state.view.deletionActive,
+
     dimensions: state.array.dimensions,
 
     masterBasePosition: state.stack.masterBasePosition,
@@ -95,4 +116,4 @@ const mapStateToProps = state => ({
     topFieldLayer: state.stack.topFieldLayer
 });
 
-export default connect(mapStateToProps)(ArrayCube);
+export default connect(mapStateToProps, { deleteFromArray })(ArrayCube);

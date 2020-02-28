@@ -21,10 +21,10 @@ const CubeGroup = props => {
     // Parent Props
     const { groupArray, path, depth, currentFieldPaths, position, size, opacity, parentSelected, parentFieldDim, parentFieldOffset, parentFocus } = props;
     // Redux Props
-    const { prevTransitionActive, transitionActive, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeFieldElements, topFieldLayer, activeRoots, topRoot, expandStack, collapseStack, persistTransition, completeTransition } = props;
+    const { prevTransitionActive, transitionActive, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeFieldElements, topFieldLayer, activeRoots, expandStack, collapseStack, persistTransition, completeTransition } = props;
 
-    const inActiveField = activeFieldElements.includes(path);
-    const inTopField = topFieldLayer.includes(path);
+    const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
+    const inTopField = useMemo(() => topFieldLayer.some(el => el.join(',') === path.join(',')), [topFieldLayer]);
 
     // Position Config
     const newFieldDim = Math.ceil(Math.sqrt(groupArray.length)) > parentFieldDim ? Math.ceil(Math.sqrt(groupArray.length)) : parentFieldDim;
@@ -34,7 +34,7 @@ const CubeGroup = props => {
     let { trueFieldPositions, newFieldOffset } = compensateFieldPositions(rawFieldPositions, position, size, fieldElementSize, parentFieldOffset, layerPadPerc);
 
     // Internal State
-    const nextFieldPaths = groupArray.map((e, i) => path+i);
+    const nextFieldPaths = groupArray.map((e, i) => [...path, i]);
     const nextFocus = parentFocus+(size[1]/2)+(fieldElementSize[1]/2)+layerPadPerc;
     const [selected, setSelected] = useState(false);
     const [suspended, setSuspended] = useState(false);
@@ -46,6 +46,7 @@ const CubeGroup = props => {
     const prevSize = usePrevious(size);
     const [childSize, setChildSize] = useState(cubeElementSize);
     const [childOpacity, setChildOpacity] = useState(1);
+    
     
     /* RESPOND TO REDUX CHANGES*/
     useEffect(() => {
@@ -62,6 +63,7 @@ const CubeGroup = props => {
         }
         staggerTransitionOut();
     }, [transitionActive]);
+
 
     /* RESPOND TO PARENT COMPONENT CHANGES */
     useEffect(() => {
@@ -111,11 +113,12 @@ const CubeGroup = props => {
         pointInt: parentSelected ? 0.5 : 0
     });
 
+
     /* RESPOND TO CHILD COMPONENT CHANGES */
     const selectionHandler = () => {
         if(inActiveField) {
             if (selected) {
-                collapseStack(path, currentFieldPaths, activeFieldElements, activeRoots, parentFocus);
+                collapseStack(path, currentFieldPaths, parentFocus);
                 changePositions(false);
             } else if(inTopField) {
                 expandStack(path, nextFieldPaths, nextFocus);
@@ -165,14 +168,14 @@ const CubeGroup = props => {
                         parentFieldDim={newFieldDim}
                         parentFieldOffset={newFieldOffset}
                         parentFocus={nextFocus}
-                        key={nextFieldPaths[i]}/>
+                        key={nextFieldPaths[i].join(',')}/>
                 ) : (
                     <PrimCube
                         path={nextFieldPaths[i]} 
                         position={childPositions[i]}
                         size={childSize}
                         opacity={childOpacity}
-                        key={nextFieldPaths[i]}/>
+                        key={nextFieldPaths[i].join(',')}/>
                 )
             })}
         </a.mesh>
@@ -206,9 +209,11 @@ CubeGroup.propTypes = {
     activeFieldElements: PropTypes.array,
     topFieldLayer: PropTypes.array,
     activeRoots: PropTypes.array,
-    topRoot: PropTypes.string
+    topRoot: PropTypes.array
 };
 
-const ConnectedCubeGroup = connect(mapStateToProps, {expandStack, collapseStack, persistTransition, completeTransition})(CubeGroup);
+const ConnectedCubeGroup = connect(mapStateToProps, {
+    expandStack, collapseStack, persistTransition, completeTransition
+})(CubeGroup);
 
 export default ConnectedCubeGroup;

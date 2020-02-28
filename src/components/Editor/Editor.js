@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
-import delay from 'delay';
 
 import './Editor.css';
-import { startTransition } from '../../redux/actions/viewActions';
+import { startTransition, startDeletion, endDeletion } from '../../redux/actions/viewActions';
 import { addToArray } from '../../redux/actions/arrayActions';
 
 const Editor = props => {
-    const { startTransition, addToArray } = props;
+    const { deletionActive, startTransition, startDeletion, endDeletion, addToArray } = props;
     const [active, setActive] = useState(false);
 
     useEffect(() => {
@@ -17,6 +16,14 @@ const Editor = props => {
 
     const addHandler = () => {
         addToArray();
+    }
+
+    const deleteHandler = () => {
+        if(deletionActive) {
+            endDeletion();
+        } else {
+            startDeletion();
+        }
     }
 
     const exitHandler = async () => {
@@ -30,7 +37,7 @@ const Editor = props => {
         <div className="editor-container">
             <a.section className="e-buttons" style={buttonSpring}>
                 <button className="e-button" onClick={addHandler}>Add</button>
-                <button className="e-button">Highlight</button>
+                <button className="e-button" onClick={deleteHandler}>{deletionActive ? 'Cancel' : 'Delete'}</button>
                 <button className="e-button">Swap</button>
                 <button className="e-button">Download</button>
                 <button className="e-button" onClick={exitHandler}>Exit</button>
@@ -40,7 +47,8 @@ const Editor = props => {
 }
 
 const mapStateToProps = state => ({
-    view: state.view.view
+    view: state.view.view,
+    deletionActive: state.view.deletionActive
 });
 
-export default connect(mapStateToProps, { startTransition, addToArray })(Editor);
+export default connect(mapStateToProps, { startTransition, addToArray, startDeletion, endDeletion })(Editor);

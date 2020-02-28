@@ -8,10 +8,10 @@ const initialState = {
 
     focusPosition: [0, 0, 0],
 
-    activeFieldElements: ['base'],
-    topFieldLayer: ['base'],
+    activeFieldElements: [['base']],
+    topFieldLayer: [['base']],
     activeRoots: [],
-    topRoot: ''
+    topRoot: []
 };
 
 export default function(state = initialState, action) {
@@ -48,10 +48,10 @@ export default function(state = initialState, action) {
                 ...state,
                 focusPosition: [0, 0, 0],
 
-                activeFieldElements: ['base'],
-                topFieldLayer: ['base'],
+                activeFieldElements: [['base']],
+                topFieldLayer: [['base']],
                 activeRoots: [],
-                topRoot: ''
+                topRoot: []
             }
             default:
                 return state

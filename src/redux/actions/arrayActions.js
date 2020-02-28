@@ -1,11 +1,11 @@
-import { ADD_TO_ARRAY, INSERT_STACK } from './types';
+import { ADD_TO_ARRAY, DELETE_FROM_ARRAY, INSERT_STACK } from './types';
 
 export const addToArray = () => (dispatch, getState) => {
-    let currentPath = getState().array.currentPath.slice();
-    let userArray = getState().array.userArray.slice();
-    const activeRoots = getState().stack.activeRoots;
-    const topFieldLayer = getState().stack.topFieldLayer;
-    const topRoot = getState().stack.topRoot;
+    const currentPath = getState().array.currentPath.slice();
+    const userArray = getState().array.userArray.slice();
+    const activeRoots = getState().stack.activeRoots.slice();
+    const topFieldLayer = getState().stack.topFieldLayer.slice();
+    const topRoot = getState().stack.topRoot.slice();
 
     // Takes in an array of indexes, the multidimensional array of elements it refers to, and a new element to insert. 
     // Traverses the array of elements using the indexPath and pushes the new element at the final index.
@@ -24,16 +24,36 @@ export const addToArray = () => (dispatch, getState) => {
         return array;
     }
 
-    // Note: before implementing this, fix the existing path bug with newly added cubes
-    // This is a glaring bug - we are currently using path length to manage their placement in the redux store but this only works for single digit indexes.
-    const pathGen = activeRoots.length <= 1 ? 'base' + (userArray.length).toString() : topRoot + (topFieldLayer.length).toString();
-
+    const pathGen = topRoot.length <= 1 ? ['base', userArray.length] : [...topRoot, topFieldLayer.length];
     const newUserArray = traverseAdd(currentPath, userArray, 'element');
 
-    //if (topRoot !== '') dispatch({ type: INSERT_STACK, payload: pathGen });
+    if (topRoot.length > 0) dispatch({ type: INSERT_STACK, payload: pathGen });
     
     dispatch({
         type: ADD_TO_ARRAY,
+        payload: newUserArray
+    })
+}
+
+export const deleteFromArray = path => (dispatch, getState) => {
+    const userArray = getState().array.userArray.slice();
+    path = path.slice(1);
+
+    function traverseRemove(indexPath, array) {
+        const idx = indexPath.shift();
+        if (idx === undefined) return [];
+        const [ step ] = array.splice(idx, 1);
+        if (indexPath.length !== 0) {
+            const next = traverseRemove(indexPath, step);
+            array.splice(idx, 0, next);
+        }
+        return array;
+    }
+
+    const newUserArray = traverseRemove(path, userArray);
+    
+    dispatch({
+        type: DELETE_FROM_ARRAY,
         payload: newUserArray
     })
 }
