@@ -6,9 +6,12 @@ import { useSpring, a } from 'react-spring/three';
 import delay from 'delay';
 import * as THREE from 'three';
 
+// Imported Sheets
+import { usePrevious } from '../../utils/CustomHooks';
+
 const ArrayCube = props => {
-    let { position, size, path, selectionHandler, selected } = props;
-    let { expandedLayers, topLayer } = props;
+    let { position, size, opacity, path, depth, selectionHandler, selected } = props;
+    let { dimensions, activeFieldElements, topFieldLayer } = props;
 
     // Geometry Config
     const cubeVertices = [[-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, 0.5], [0.5, 0.5, 0.5]];
@@ -24,53 +27,72 @@ const ArrayCube = props => {
     const appliedWallF = useMemo(() => wallFaces.map(f => new THREE.Face3(...f)), []);
     const appliedFloorF = useMemo(() => floorFaces.map(f => new THREE.Face3(...f)), []);
 
+    // Respond to Redux Changes
+    const [activityState, setActivityState] = useState('collapsed')
+    const [relativeStrength, setRelativeStrength] = useState(0);
+
+    useEffect(() => {
+        activeFieldElements.includes(path) ?
+            setActivityState('expanded') :
+            setActivityState('collapsed');
+    }, [activeFieldElements, topFieldLayer]);
+
+    useEffect(() => {
+        const newStrength = 1 - (1/dimensions)*depth === 0 ? 10 :
+                            Math.round((1 - (1/dimensions)*depth)*100);
+        setRelativeStrength(newStrength);
+    }, [dimensions]);
+
+    // Respond to Parent Changes
+    const [cubePosition, setCubePosition] = useState(position);
+    const [cubeSize, setCubeSize] = useState(size);
+    
+    useEffect(() => {
+        setCubePosition(position);
+        setCubeSize(size);
+    }, [position, size]); 
+
     // Pass action to Parent
     const toggleExpansion = e => {
         e.stopPropagation();
         selectionHandler();
     }
 
-    // Respond to Parent Changes
-    const [cubePosition, setCubePosition] = useState(position);
-    const [cubeSize, setCubeSize] = useState(size);
-
-    useEffect(() => {
-        setCubePosition(position);
-        setCubeSize(size);
-    }, [position, size]); 
-
     // Animate Changes
     const aProps = useSpring({
         cPosition: cubePosition,
         cSize: cubeSize,
+        cOpacity: opacity
     });
 
     return (
         <a.mesh position={aProps.cPosition} scale={aProps.cSize} onClick={e => toggleExpansion(e)}>
             <mesh>
                 <geometry attach="geometry" vertices={vertices} faces={appliedFloorF} onUpdate={self => self.computeFaceNormals()}/>
-                <meshPhongMaterial attach="material" color="grey" side={THREE.FrontSide} />
+                <a.meshPhongMaterial attach="material" color="grey" transparent opacity={aProps.cOpacity} side={THREE.FrontSide} />
             </mesh>
             <mesh>
                 <geometry attach="geometry" vertices={vertices} faces={appliedWallF} onUpdate={self => self.computeFaceNormals()}/>
-                <meshPhongMaterial attach="material" color="grey" side={THREE.BackSide} />
+                <a.meshPhongMaterial attach="material" color="grey" transparent opacity={aProps.cOpacity} side={THREE.BackSide} />
             </mesh>
             <mesh>
                 <geometry attach="geometry" vertices={vertices} faces={appliedFloorF} onUpdate={self => self.computeFaceNormals()}/>
-                <meshPhongMaterial attach="material" color="grey" side={THREE.BackSide} />
+                <a.meshPhongMaterial attach="material" color="grey" transparent opacity={aProps.cOpacity} side={THREE.BackSide} />
             </mesh>
         </a.mesh>
     )
 }
 
 const mapStateToProps = state => ({
-    masterBasePosition: state.array.masterBasePosition,
-    baseFieldSize: state.array.baseFieldSize,
-    unitPadPerc: state.array.unitPadPerc,
-    layerPadPerc: state.array.layerPadPerc,
+    dimensions: state.array.dimensions,
 
-    expandedLayers: state.stack.expandedLayers,
-    topLayer: state.stack.topLayer
+    masterBasePosition: state.stack.masterBasePosition,
+    baseFieldSize: state.stack.baseFieldSize,
+    unitPadPerc: state.stack.unitPadPerc,
+    layerPadPerc: state.stack.layerPadPerc,
+
+    activeFieldElements: state.stack.activeFieldElements,
+    topFieldLayer: state.stack.topFieldLayer
 });
 
 export default connect(mapStateToProps)(ArrayCube);

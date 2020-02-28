@@ -1,23 +1,21 @@
 // Dependencies
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
 
 // Imported Sheets
 import Home from '../Home/Home';
 import Editor from '../Editor/Editor';
 
-const Overlay = () => {
-
-    const [viewState, setViewState] = useState('home');
-  
-    const updateViewState = newView => {
-      setViewState(newView);
-    }
+const Overlay = props => {
+    const { view } = props;
   
     return (
-        <>
-          {viewState === 'home' ? <Home updateViewState={updateViewState}/> : <Editor updateViewState={updateViewState}/>}
-        </>
+          view === 'home' ? <Home /> : <Editor />
     );
 }
 
-export default Overlay;
+const mapStateToProps = state => ({
+  view: state.view.view
+});
+
+export default connect(mapStateToProps)(Overlay);

@@ -1,6 +1,6 @@
 /* Dependencies */
-import React, { Suspense, useRef, useState, useEffect} from 'react';
-import { Provider, connect, ReactReduxContext } from 'react-redux';
+import React, { Suspense, useRef, useState, useEffect, useMemo} from 'react';
+import { Provider, connect } from 'react-redux';
 import delay from 'delay';
 import PropTypes from 'prop-types';
 
@@ -14,17 +14,57 @@ import * as THREE from 'three';
 import store from '../../redux/store';
 import ConnectedCubeGroup from './CubeGroup';
 import { getFieldData } from '../../utils/Calculator';
+import { usePrevious } from '../../utils/CustomHooks';
 
 extend({ OrbitControls });
 
-const Controls = () => {
+const Controls = props => {
+    const { focusPosition } = props;
     const { camera, gl } = useThree();
     const orbitRef = useRef();
-  
-    camera.position.set(2, 2, 2);
+
+    const [ targetY, setTargetY ] = useState(focusPosition[1]);
+    const [ prevTargetY, setPrevTargetY ] = useState(targetY);
+
+    const [ positionY, setPositionY ] = useState(camera.position.y);
+    const [ refocusActive, setRefocusActive ] = useState(false);
+
+    useEffect(() => {
+        camera.position.set(10, 10, 10);
+    }, [])
+
+    useEffect(() => {
+        setPrevTargetY(targetY);
+        setTargetY(focusPosition[1]);
+    }, [focusPosition]);
+
+    useEffect(() => {
+        if(targetY !== prevTargetY) {
+            setPositionY(camera.position.y);
+            setRefocusActive(true);
+        }
+    }, [targetY])
+
+    const { targetSpring } = useSpring({
+      from: { targetSpring: prevTargetY },
+      targetSpring: targetY
+    })
+
+    const { positionSpring } = useSpring({
+        from: { positionSpring: positionY },
+        positionSpring: targetY,
+        onRest: () => setRefocusActive(false)
+    });
   
     useFrame(() => {
-      orbitRef.current.update()
+        if (orbitRef.current.target.y !== targetY) {
+            orbitRef.current.target.y = targetSpring.value;
+        };
+
+        if (camera.position.y < targetY && refocusActive) {
+            camera.position.y = positionSpring.value
+        };
+        orbitRef.current.update()
     })
   
     return (
@@ -32,42 +72,81 @@ const Controls = () => {
           args={[camera, gl.domElement]}
           ref={orbitRef}
           enableDamping
-          target={[0, 0, 0]}
         />
+    )
+}
+
+const SceneLight = props => {
+    const { focusPosition, baseFieldSize } = props;
+
+    const aProps = useSpring({
+        spotTarget: focusPosition,
+        spotPosition: [focusPosition[0], focusPosition[1]+baseFieldSize*2, focusPosition[2]]
+    });
+
+    const light = useMemo(() => new THREE.SpotLight(0xffffff, 0.5), []);
+
+    return (
+        <>
+        <a.primitive object={light} position={aProps.spotPosition}/>
+        <primitive object={light.target} position={[0, 0, 0]}/>
+        </>
     )
 }
 
 const Scene = props => {
 
-    const { baseArray, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc } = props;
+    const { view, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc} = props;
 
-    const fieldDim = Math.ceil(Math.sqrt(baseArray.length));
+    const [currentArray, setCurrentArray] = useState(demoArray);
 
-    const { fieldElementSize } = getFieldData(fieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
+    const baseSize = new Array(3).fill(baseFieldSize-unitPadPerc);
+    const fieldDim = Math.ceil(Math.sqrt(currentArray.length));
+
+    useEffect(() => {
+        view === 'edit' ? setCurrentArray(userArray) : 
+                          setCurrentArray(demoArray);
+    }, [view]);
+
+    useEffect(() => {
+        if (view === 'edit') setCurrentArray(userArray);
+    }, [userArray])
 
     return (
-        <Canvas>
-        <Controls />
+        <Canvas
+            onCreated={({ gl }) => {
+            gl.sortObjects = false;
+        }}>
+        <Controls focusPosition={focusPosition}/>
         <ambientLight />
-        <spotLight position={[4, 4, 4]} intensity={0.5}/>
+        <SceneLight focusPosition={focusPosition} baseFieldSize={baseFieldSize}/>
         <Provider store={store}>
-            <ConnectedCubeGroup 
-                groupArray={baseArray}
-                path={['base']}
+                <ConnectedCubeGroup 
+                groupArray={currentArray}
+                path={'base'}
+                depth={0}
+                currentFieldPaths={['base']}
+
                 position={masterBasePosition}
-                size={fieldElementSize}
+                size={baseSize}
+                opacity={1}
                 parentFieldDim={fieldDim}
                 parentFieldOffset={masterBasePosition}
+                parentFocus={0}
                 parentSelected={true}
-            />
+                />
         </Provider>
         </Canvas>
     )
 }
 
 const mapStateToProps = state => ({
-    baseArray: state.array.baseArray,
-    
+    view: state.view.view,
+
+    demoArray: state.array.demoArray,
+    userArray: state.array.userArray,
+
+    focusPosition: state.stack.focusPosition,
     masterBasePosition: state.stack.masterBasePosition,
     baseFieldSize: state.stack.baseFieldSize,
     unitPadPerc: state.stack.unitPadPerc,
@@ -75,7 +154,12 @@ const mapStateToProps = state => ({
 });
 
 Scene.propTypes = {
-    baseArray: PropTypes.array,
+    view: PropTypes.string,
+
+    demoArray: PropTypes.array,
+    userArray: PropTypes.array,
+
+    focusPosition: PropTypes.array,
     masterBasePosition: PropTypes.array,
     baseFieldSize: PropTypes.number,
     unitPadPerc: PropTypes.number,

@@ -49,7 +49,7 @@ export const compensateFieldPositions = (fieldPositions, position, size, fieldEl
         ];
     });
 
-    return { trueFieldPositions, newFieldOffset };
+    return { trueFieldPositions, newFieldOffset, newBaseOffset };
 }
 
 // Returns an array of zeroed vertices which denote the center points
