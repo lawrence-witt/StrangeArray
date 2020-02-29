@@ -11,7 +11,7 @@ import { usePrevious } from '../../utils/CustomHooks';
 import { deleteFromArray } from '../../redux/actions/arrayActions';
 
 const ArrayCube = props => {
-    let { position, size, opacity, path, depth, selectionHandler, selected } = props;
+    let { position, size, opacity, path, depth, selectionHandler, groupSelected, parentSidelined } = props;
     let { dimensions, activeFieldElements, topFieldLayer, deleteFromArray, deletionActive} = props;
 
     // Geometry Config
@@ -33,19 +33,19 @@ const ArrayCube = props => {
     const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
     const inTopField = useMemo(() => topFieldLayer.some(el => el.join(',') === path.join(',')), [topFieldLayer]);
 
+    //const [cubeSelected, setCubeSelected] = useState(false);
     const [activityState, setActivityState] = useState('collapsed')
     const [relativeStrength, setRelativeStrength] = useState(0);
 
-    // The simplest way to fix this transition might be to let the array cube control its own selected state. It doesn't actually use the parent select for anything.
     useEffect(() => {
         inTopField ? 
             setActivityState('focussed') :
-        inActiveField && selected ?
+        inActiveField && groupSelected ?
             setActivityState('expanded') :
-        inActiveField && !inTopField ?
+        parentSidelined ?
             setActivityState('overriden') :
             setActivityState('collapsed');
-    }, [inActiveField, inTopField, selected]);
+    }, [inActiveField, inTopField, groupSelected, parentSidelined]);
 
     useEffect(() => {
         const newStrength = 1 - (1/dimensions)*depth === 0 ? 10 :
@@ -63,7 +63,6 @@ const ArrayCube = props => {
         setCubeSize(size);
     }, [position, size]); 
 
-
     /* RESPOND TO CLICK EVENT */
     const arrayClickHandler = e => {
         if(deletionActive && inTopField) {
@@ -71,7 +70,7 @@ const ArrayCube = props => {
             deleteFromArray(path);
         } else if (deletionActive) {
             e.stopPropagation();
-        } else if (inActiveField) {
+        } else if (inActiveField && !parentSidelined) {
             e.stopPropagation();
             selectionHandler();
         }
@@ -81,7 +80,7 @@ const ArrayCube = props => {
     const aProps = useSpring({
         cPosition: cubePosition,
         cSize: cubeSize,
-        cOpacity: activityState === 'overriden' ? 0.3 : opacity
+        cOpacity: activityState === 'overriden' ? 0.2 : opacity
     });
 
     return (

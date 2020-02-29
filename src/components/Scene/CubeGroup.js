@@ -19,24 +19,28 @@ import { persistTransition, completeTransition } from '../../redux/actions/viewA
 
 const CubeGroup = props => {
     // Parent Props
-    const { groupArray, path, depth, currentFieldPaths, position, size, opacity, parentSelected, parentFieldDim, parentFieldOffset, parentFocus } = props;
+    const { groupArray, path, depth, currentFieldPaths, position, size, opacity, parentSelected, parentLightActive, parentSidelined, parentFieldDim, parentFieldOffset, parentFocus } = props;
     // Redux Props
     const { prevTransitionActive, transitionActive, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeFieldElements, topFieldLayer, activeRoots, expandStack, collapseStack, persistTransition, completeTransition } = props;
-
-    const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
-    const inTopField = useMemo(() => topFieldLayer.some(el => el.join(',') === path.join(',')), [topFieldLayer]);
 
     // Position Config
     const newFieldDim = Math.ceil(Math.sqrt(groupArray.length)) > parentFieldDim ? Math.ceil(Math.sqrt(groupArray.length)) : parentFieldDim;
 
-    let { defaultPositions, raisedPositions, cubeElementSize } = getCubeData(groupArray, position, size, unitPadPerc);
-    let { rawFieldPositions, fieldElementSize } = getFieldData(newFieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
-    let { trueFieldPositions, newFieldOffset } = compensateFieldPositions(rawFieldPositions, position, size, fieldElementSize, parentFieldOffset, layerPadPerc);
+    const { defaultPositions, raisedPositions, cubeElementSize } = getCubeData(groupArray, position, size, unitPadPerc);
+    const { rawFieldPositions, fieldElementSize } = getFieldData(newFieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
+    const { trueFieldPositions, newFieldOffset } = compensateFieldPositions(rawFieldPositions, position, size, fieldElementSize, parentFieldOffset, layerPadPerc);
 
     // Internal State
+    const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
+    const inTopField = useMemo(() => topFieldLayer.some(el => el.join(',') === path.join(',')), [topFieldLayer]);
+    const inActiveRoots = useMemo(() => activeRoots.some(el => el.join(',') === path.join(',')), [activeRoots]);
+    const inSidelinedPath = parentSidelined || (inActiveField && !inTopField && !inActiveRoots);
+
+    const [pointLightActive, setPointLightActive] = useState(false);
+
     const nextFieldPaths = groupArray.map((e, i) => [...path, i]);
     const nextFocus = parentFocus+(size[1]/2)+(fieldElementSize[1]/2)+layerPadPerc;
-    const [selected, setSelected] = useState(false);
+    const [groupSelected, setGroupSelected] = useState(false);
     const [suspended, setSuspended] = useState(false);
 
     const prevPosition = usePrevious(position);
@@ -53,7 +57,8 @@ const CubeGroup = props => {
         // Transition out the current user or demo array
         async function staggerTransitionOut() {
             if(!prevTransitionActive && transitionActive) {
-                setSelected(false);
+                setGroupSelected(false);
+                setPointLightActive(false);
                 setChildPositions(raisedPositions);
                 setChildOpacity(0);
                 await delay(500);
@@ -94,7 +99,7 @@ const CubeGroup = props => {
 
         // Update the positions when a new element is added
         if(!prevTransitionActive && !transitionActive) {
-            if(selected) {
+            if(groupSelected) {
                 setChildPositions(trueFieldPositions);
                 setChildSize(fieldElementSize);
             } else {
@@ -105,19 +110,20 @@ const CubeGroup = props => {
     }, [groupArray])
 
     useEffect(() => {
-        if (!parentSelected) setSelected(false);
+        if (!parentSelected) setGroupSelected(false); setPointLightActive(false);
     }, [parentSelected]);
 
+    // Animate Changes
     const aProps = useSpring({
         gPosition: groupPosition,
-        pointInt: parentSelected ? 0.5 : 0
+        pointInt: parentLightActive ? 0.5 : 0
     });
 
 
     /* RESPOND TO CHILD COMPONENT CHANGES */
     const selectionHandler = () => {
         if(inActiveField) {
-            if (selected) {
+            if (groupSelected) {
                 collapseStack(path, currentFieldPaths, parentFocus);
                 changePositions(false);
             } else if(inTopField) {
@@ -129,13 +135,15 @@ const CubeGroup = props => {
 
     const changePositions = async (upwards) => {
         if(upwards) {
+            setGroupSelected(true);
             setChildPositions(raisedPositions);
             await delay (500);
             setChildPositions(trueFieldPositions);
             setChildSize(fieldElementSize);
-            setSelected(true);
+            setPointLightActive(true);
         } else {
-            setSelected(false);
+            setPointLightActive(false);
+            setGroupSelected(false);
             setChildPositions(raisedPositions);
             setChildSize(cubeElementSize);
             await delay(500);
@@ -147,11 +155,19 @@ const CubeGroup = props => {
         <a.mesh position={aProps.gPosition}>
 
             <a.pointLight 
-              position={aProps.gPosition} 
-              color="white"
-              intensity={aProps.pointInt}
-              distance={size[0]*2}/>
-            <ArrayCube position={position} size={size} opacity={opacity} path={path} depth={depth} selectionHandler={selectionHandler} selected={selected}/>
+                position={aProps.gPosition} 
+                color="white"
+                intensity={aProps.pointInt}
+                distance={size[0]*2}/>
+            <ArrayCube 
+                position={position} 
+                size={size} 
+                opacity={opacity} 
+                path={path} 
+                depth={depth} 
+                selectionHandler={selectionHandler}
+                parentSidelined={inSidelinedPath}
+                groupSelected={groupSelected}/>
 
             {suspended ? null : groupArray.map((lowerElement, i) => {
                 return !childPositions[i] ? null : Array.isArray(lowerElement) ? (
@@ -164,14 +180,18 @@ const CubeGroup = props => {
                         position={childPositions[i].map(vec => vec/2)}
                         size={childSize}
                         opacity={childOpacity}
-                        parentSelected={selected}
+                        parentSelected={groupSelected}
+                        parentLightActive={pointLightActive}
+                        parentSidelined={inSidelinedPath}
                         parentFieldDim={newFieldDim}
                         parentFieldOffset={newFieldOffset}
                         parentFocus={nextFocus}
                         key={nextFieldPaths[i].join(',')}/>
                 ) : (
                     <PrimCube
-                        path={nextFieldPaths[i]} 
+                        path={nextFieldPaths[i]}
+                        parentSidelined={inSidelinedPath}
+                        
                         position={childPositions[i]}
                         size={childSize}
                         opacity={childOpacity}

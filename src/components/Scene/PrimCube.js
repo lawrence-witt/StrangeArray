@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import { deleteFromArray } from '../../redux/actions/arrayActions';
 
 const PrimCube = props => {
-    const {position, size, opacity, path} = props;
+    const {position, size, opacity, path, parentSidelined} = props;
     const {deletionActive, deleteFromArray, activeFieldElements, topFieldLayer} = props;
 
     const [activityState, setActivityState] = useState('collapsed');
@@ -23,10 +23,10 @@ const PrimCube = props => {
     useEffect(() => {
         inTopField ?
             setActivityState('focussed') :
-        inActiveField && !inTopField ?
+        (inActiveField && !inTopField) || parentSidelined ?
             setActivityState('overriden') :
             setActivityState('collapsed');
-    }, [inActiveField, inTopField]);
+    }, [inActiveField, inTopField, parentSidelined]);
 
 
     /* RESPOND TO PARENT CHANGES */
@@ -53,7 +53,7 @@ const PrimCube = props => {
     const aProps = useSpring({
         cPosition: cubePosition,
         cSize: cubeSize,
-        cOpacity: activityState === 'overriden' ? 0.3 : opacity
+        cOpacity: activityState === 'overriden' ? 0.2 : opacity
     });
 
     return (

@@ -121,20 +121,22 @@ const Scene = props => {
         <ambientLight />
         <SceneLight focusPosition={focusPosition} baseFieldSize={baseFieldSize}/>
         <Provider store={store}>
-                <ConnectedCubeGroup 
-                groupArray={currentArray}
-                path={['base']}
-                depth={0}
-                currentFieldPaths={[['base']]}
+            <ConnectedCubeGroup 
+            groupArray={currentArray}
+            path={['base']}
+            depth={0}
+            currentFieldPaths={[['base']]}
 
-                position={masterBasePosition}
-                size={baseSize}
-                opacity={1}
-                parentFieldDim={fieldDim}
-                parentFieldOffset={masterBasePosition}
-                parentFocus={0}
-                parentSelected={true}
-                />
+            position={masterBasePosition}
+            size={baseSize}
+            opacity={1}
+            parentFieldDim={fieldDim}
+            parentFieldOffset={masterBasePosition}
+            parentFocus={0}
+            parentSelected={true}
+            parentLightActive={true}
+            parentSidelined={false}
+            />
         </Provider>
         </Canvas>
     )
