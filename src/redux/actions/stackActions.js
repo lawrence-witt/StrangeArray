@@ -7,7 +7,9 @@ import {
 export const expandStack = (newRoot, newFieldElements, newFocus) => (dispatch, getState) => {
     
     const currentFocus = getState().stack.focusPosition;
-    newFocus = [currentFocus[0], newFocus, currentFocus[2]];
+
+    // This is a temporary fix: the Calculator functions should be reworked during testing
+    newFocus = !newFocus ? [0, 0, 0] : [currentFocus[0], newFocus, currentFocus[2]];
 
     dispatch({
         type: EXPAND_STACK,

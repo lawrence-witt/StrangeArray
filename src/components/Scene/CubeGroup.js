@@ -55,8 +55,8 @@ const CubeGroup = props => {
     /* RESPOND TO REDUX CHANGES*/
     useEffect(() => {
         // Transition out the current user or demo array
-        async function staggerTransitionOut() {
-            if(!prevTransitionActive && transitionActive) {
+        if(!prevTransitionActive && transitionActive) {
+            async function staggerTransitionOut() {
                 setGroupSelected(false);
                 setPointLightActive(false);
                 setChildPositions(raisedPositions);
@@ -65,8 +65,8 @@ const CubeGroup = props => {
                 setSuspended(true);
                 if (depth===0) persistTransition();
             }
+            staggerTransitionOut();
         }
-        staggerTransitionOut();
     }, [transitionActive]);
 
 
@@ -97,7 +97,7 @@ const CubeGroup = props => {
             staggerTransitionIn();
         };
 
-        // Update the positions when a new element is added
+        // Update the positions when a new element is added or removed
         if(!prevTransitionActive && !transitionActive) {
             if(groupSelected) {
                 setChildPositions(trueFieldPositions);
@@ -127,7 +127,6 @@ const CubeGroup = props => {
                 collapseStack(path, currentFieldPaths, parentFocus);
                 changePositions(false);
             } else if(inTopField) {
-                console.log(fieldElementSize);
                 expandStack(path, nextFieldPaths, nextFocus);
                 changePositions(true);
             };

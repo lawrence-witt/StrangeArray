@@ -17,8 +17,10 @@ export const getCubeData = (array, position, size, padPerc) => {
     let cubeLength = size[0]; // the computed length of one side of the CubeGroup
     let cubeDim = Math.ceil(Math.cbrt(array.length)); // the overall unit dimension of the CubeGroup (e.g 2 for 2x2x2, 3 for 3x3x3)
 
-    let cubeUnitLength = cubeLength/cubeDim; // the length of one side of a unit
-    let cubeUnitSize = new Array(3).fill(cubeUnitLength); // the size of each unit inside the cube
+    // The length of one side of a unit
+    let cubeUnitLength = cubeLength/cubeDim;
+    // The size of each unit inside the cube
+    let cubeUnitSize = new Array(3).fill(cubeUnitLength); 
 
     // Calculate the position of each possible Cube within the CubeGroup
     let constructors = getConstructors(cubeLength, cubeDim, cubeUnitLength);
