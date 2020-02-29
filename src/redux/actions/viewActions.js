@@ -2,21 +2,12 @@ import {
     START_TRANSITION, 
     PERSIST_TRANSITION, 
     COMPLETE_TRANSITION, 
-    START_DELETION, 
-    END_DELETION,
-    
-    UPDATE_PATH,
-
+    TOGGLE_DELETION,
     CLEAR_STACK } from './types';
 
 export const startTransition = destination => dispatch => {
 
     dispatch({ type: CLEAR_STACK });
-
-    dispatch({
-        type: UPDATE_PATH,
-        payload: []
-    })
 
     dispatch({
         type: START_TRANSITION,
@@ -42,12 +33,7 @@ export const completeTransition = () => dispatch => {
     dispatch({ type: COMPLETE_TRANSITION });
 }
 
-export const startDeletion = () => dispatch => {
+export const toggleDeletion = newState => dispatch => {
 
-    dispatch({ type: START_DELETION });
-}
-
-export const endDeletion = () => dispatch => {
-
-    dispatch({ type: END_DELETION });
+    dispatch({ type: TOGGLE_DELETION, payload: newState });
 }

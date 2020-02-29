@@ -127,6 +127,7 @@ const CubeGroup = props => {
                 collapseStack(path, currentFieldPaths, parentFocus);
                 changePositions(false);
             } else if(inTopField) {
+                console.log(fieldElementSize);
                 expandStack(path, nextFieldPaths, nextFocus);
                 changePositions(true);
             };

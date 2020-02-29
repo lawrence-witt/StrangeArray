@@ -1,4 +1,4 @@
-import { START_TRANSITION, PERSIST_TRANSITION, COMPLETE_TRANSITION, START_DELETION, END_DELETION } from '../actions/types';
+import { START_TRANSITION, PERSIST_TRANSITION, COMPLETE_TRANSITION, TOGGLE_DELETION } from '../actions/types';
 
 const initialState = {
     view: 'home',
@@ -31,15 +31,10 @@ export default function(state = initialState, action) {
                 prevTransitionActive: false,
                 transitionDestination: ''
             }
-        case START_DELETION:
+        case TOGGLE_DELETION:
             return {
                 ...state,
-                deletionActive: true
-            }
-        case END_DELETION:
-            return {
-                ...state,
-                deletionActive: false
+                deletionActive: action.payload
             }
         default:
             return state;

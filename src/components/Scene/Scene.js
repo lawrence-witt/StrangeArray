@@ -145,8 +145,8 @@ const Scene = props => {
 const mapStateToProps = state => ({
     view: state.view.view,
 
-    demoArray: state.array.demoArray,
-    userArray: state.array.userArray,
+    demoArray: state.stack.demoArray,
+    userArray: state.stack.userArray,
 
     focusPosition: state.stack.focusPosition,
     masterBasePosition: state.stack.masterBasePosition,

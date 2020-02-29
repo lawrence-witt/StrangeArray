@@ -3,7 +3,6 @@ import { ADD_TO_ARRAY, DELETE_FROM_ARRAY, INSERT_STACK } from './types';
 export const addToArray = () => (dispatch, getState) => {
     const currentPath = getState().array.currentPath.slice();
     const userArray = getState().array.userArray.slice();
-    const activeRoots = getState().stack.activeRoots.slice();
     const topFieldLayer = getState().stack.topFieldLayer.slice();
     const topRoot = getState().stack.topRoot.slice();
 
@@ -55,5 +54,5 @@ export const deleteFromArray = path => (dispatch, getState) => {
     dispatch({
         type: DELETE_FROM_ARRAY,
         payload: newUserArray
-    })
+    });
 }

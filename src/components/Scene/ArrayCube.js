@@ -8,11 +8,13 @@ import * as THREE from 'three';
 
 // Imported Sheets
 import { usePrevious } from '../../utils/CustomHooks';
-import { deleteFromArray } from '../../redux/actions/arrayActions';
+import { removeFromStack } from '../../redux/actions/stackActions';
 
 const ArrayCube = props => {
+    // Parent Props
     let { position, size, opacity, path, depth, selectionHandler, groupSelected, parentSidelined } = props;
-    let { dimensions, activeFieldElements, topFieldLayer, deleteFromArray, deletionActive} = props;
+    // Redux Props
+    let { dimensions, activeFieldElements, topFieldLayer, removeFromStack, deletionActive} = props;
 
     // Geometry Config
     const cubeVertices = [[-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, 0.5], [0.5, 0.5, 0.5]];
@@ -33,7 +35,6 @@ const ArrayCube = props => {
     const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
     const inTopField = useMemo(() => topFieldLayer.some(el => el.join(',') === path.join(',')), [topFieldLayer]);
 
-    //const [cubeSelected, setCubeSelected] = useState(false);
     const [activityState, setActivityState] = useState('collapsed')
     const [relativeStrength, setRelativeStrength] = useState(0);
 
@@ -61,13 +62,14 @@ const ArrayCube = props => {
     useEffect(() => {
         setCubePosition(position);
         setCubeSize(size);
-    }, [position, size]); 
+    }, [position, size]);
+    
 
     /* RESPOND TO CLICK EVENT */
     const arrayClickHandler = e => {
         if(deletionActive && inTopField) {
             e.stopPropagation();
-            deleteFromArray(path);
+            removeFromStack(path);
         } else if (deletionActive) {
             e.stopPropagation();
         } else if (inActiveField && !parentSidelined) {
@@ -104,7 +106,7 @@ const ArrayCube = props => {
 const mapStateToProps = state => ({
     deletionActive: state.view.deletionActive,
 
-    dimensions: state.array.dimensions,
+    dimensions: state.stack.dimensions,
 
     masterBasePosition: state.stack.masterBasePosition,
     baseFieldSize: state.stack.baseFieldSize,
@@ -115,4 +117,4 @@ const mapStateToProps = state => ({
     topFieldLayer: state.stack.topFieldLayer
 });
 
-export default connect(mapStateToProps, { deleteFromArray })(ArrayCube);
+export default connect(mapStateToProps, { removeFromStack })(ArrayCube);

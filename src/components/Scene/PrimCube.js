@@ -7,11 +7,11 @@ import { useSpring, a } from 'react-spring/three';
 import delay from 'delay';
 import * as THREE from 'three';
 
-import { deleteFromArray } from '../../redux/actions/arrayActions';
+import { removeFromStack } from '../../redux/actions/stackActions';
 
 const PrimCube = props => {
     const {position, size, opacity, path, parentSidelined} = props;
-    const {deletionActive, deleteFromArray, activeFieldElements, topFieldLayer} = props;
+    const {deletionActive, removeFromStack, activeFieldElements, topFieldLayer} = props;
 
     const [activityState, setActivityState] = useState('collapsed');
 
@@ -43,7 +43,7 @@ const PrimCube = props => {
     const primClickHandler = e => {
         if(deletionActive && inTopField) {
             e.stopPropagation();
-            deleteFromArray(path);
+            removeFromStack(path);
         } else if(deletionActive) {
             e.stopPropagation();
         }
@@ -78,4 +78,4 @@ PrimCube.propTypes = {
     topFieldLayer: PropTypes.array
 };
 
-export default connect(mapStateToProps, { deleteFromArray })(PrimCube);
+export default connect(mapStateToProps, { removeFromStack })(PrimCube);

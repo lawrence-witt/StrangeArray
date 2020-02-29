@@ -3,11 +3,11 @@ import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import './Editor.css';
-import { startTransition, startDeletion, endDeletion } from '../../redux/actions/viewActions';
-import { addToArray } from '../../redux/actions/arrayActions';
+import { startTransition, toggleDeletion } from '../../redux/actions/viewActions';
+import { addToStack } from '../../redux/actions/stackActions';
 
 const Editor = props => {
-    const { deletionActive, startTransition, startDeletion, endDeletion, addToArray } = props;
+    const { deletionActive, startTransition, toggleDeletion, addToStack } = props;
     const [active, setActive] = useState(false);
 
     useEffect(() => {
@@ -15,14 +15,14 @@ const Editor = props => {
     }, [])
 
     const addHandler = () => {
-        addToArray();
+        addToStack();
     }
 
     const deleteHandler = () => {
         if(deletionActive) {
-            endDeletion();
+            toggleDeletion(false);
         } else {
-            startDeletion();
+            toggleDeletion(true);
         }
     }
 
@@ -51,4 +51,4 @@ const mapStateToProps = state => ({
     deletionActive: state.view.deletionActive
 });
 
-export default connect(mapStateToProps, { startTransition, addToArray, startDeletion, endDeletion })(Editor);
+export default connect(mapStateToProps, { startTransition, toggleDeletion, addToStack })(Editor);
