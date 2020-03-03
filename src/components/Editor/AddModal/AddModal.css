@@ -1,0 +1,76 @@
+.add-modal {
+    position: absolute;
+    width: 100%;
+    max-width: 400px;
+    height: 25%;
+    background-color: grey;
+    z-index: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.type-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+    .type-button {
+        background-color: grey;
+        border: 1px solid black;
+    }
+
+    .type-button:hover {
+        cursor: pointer;
+        background-color: white;
+    }
+
+.input-container {
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+    .input-data-container {
+        flex: 3;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .input-title {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .warning-container {
+            flex: 1;
+        }
+
+        .input-box {
+            flex: 3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+            .input-box textarea {
+                width: 80%;
+                height: 100%;
+                resize: none;
+            }
+
+    .input-button-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }

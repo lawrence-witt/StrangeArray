@@ -1,24 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { a, useSpring } from 'react-spring';
+import { a, useSpring, useTransition } from 'react-spring';
 
 import './Editor.css';
+import DeleteModal from './DeleteModal/DeleteModal';
+import AddModal from './AddModal/AddModal';
 import { startTransition, toggleDeletion } from '../../redux/actions/viewActions';
-import { addToStack } from '../../redux/actions/stackActions';
 
 const Editor = props => {
-    const { deletionActive, startTransition, toggleDeletion, addToStack } = props;
-    const [active, setActive] = useState(false);
+    const { deletionActive, startTransition, toggleDeletion} = props;
+    const [editorActive, setEditorActive] = useState(false);
+    const [addModal, toggleAddModal] = useState(false);
+    const [deleteModal, toggleDeleteModal] = useState(false);
 
     useEffect(() => {
-        setActive(true);
+        setEditorActive(true);
     }, [])
 
     const addHandler = () => {
-        addToStack();
+        toggleAddModal(!addModal);
+        if(deleteModal) {
+            toggleDeleteModal(false);
+            toggleDeletion(false);
+        } 
     }
 
     const deleteHandler = () => {
+        toggleDeleteModal(!deleteModal);
+        if(addModal) toggleAddModal(false);
         if(deletionActive) {
             toggleDeletion(false);
         } else {
@@ -27,14 +36,17 @@ const Editor = props => {
     }
 
     const exitHandler = async () => {
-        setActive(false);
+        setEditorActive(false);
         startTransition('home');
     }
 
-    const buttonSpring = useSpring({transform: active ? 'translateY(0%)' : 'translateY(200%)'})
+    const buttonSpring = useSpring({transform: editorActive ? 'translateY(0%)' : 'translateY(200%)'});
+    
 
     return (
         <div className="editor-container">
+            <AddModal opened={addModal} addHandler={addHandler}/>
+            <DeleteModal opened={deleteModal} deleteHandler={deleteHandler}/>
             <a.section className="e-buttons" style={buttonSpring}>
                 <button className="e-button" onClick={addHandler}>Add</button>
                 <button className="e-button" onClick={deleteHandler}>{deletionActive ? 'Cancel' : 'Delete'}</button>
@@ -51,4 +63,4 @@ const mapStateToProps = state => ({
     deletionActive: state.view.deletionActive
 });
 
-export default connect(mapStateToProps, { startTransition, toggleDeletion, addToStack })(Editor);
+export default connect(mapStateToProps, { startTransition, toggleDeletion })(Editor);

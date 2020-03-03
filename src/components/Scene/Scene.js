@@ -96,7 +96,7 @@ const SceneLight = props => {
 
 const Scene = props => {
 
-    const { view, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc} = props;
+    const { view, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc} = props;
 
     const [currentArray, setCurrentArray] = useState(demoArray);
 
@@ -113,37 +113,40 @@ const Scene = props => {
     }, [userArray])
 
     return (
-        <Canvas
-            onCreated={({ gl }) => {
-            gl.sortObjects = false;
-        }}>
-        <Controls focusPosition={focusPosition}/>
-        <ambientLight />
-        <SceneLight focusPosition={focusPosition} baseFieldSize={baseFieldSize}/>
-        <Provider store={store}>
-            <ConnectedCubeGroup 
-            groupArray={currentArray}
-            path={['base']}
-            depth={0}
-            currentFieldPaths={[['base']]}
+        <div className={`canvas-container ${hoverActive ? 'hovered' : ''}`}>
+            <Canvas
+                onCreated={({ gl }) => {
+                gl.sortObjects = false;
+            }}>
+            <Controls focusPosition={focusPosition}/>
+            <ambientLight />
+            <SceneLight focusPosition={focusPosition} baseFieldSize={baseFieldSize}/>
+            <Provider store={store}>
+                <ConnectedCubeGroup 
+                groupArray={currentArray}
+                path={['base']}
+                depth={0}
+                currentFieldPaths={[['base']]}
 
-            position={masterBasePosition}
-            size={baseSize}
-            opacity={1}
-            parentFieldDim={fieldDim}
-            parentFieldOffset={masterBasePosition}
-            parentFocus={0}
-            parentSelected={true}
-            parentLightActive={true}
-            parentSidelined={false}
-            />
-        </Provider>
-        </Canvas>
+                position={masterBasePosition}
+                size={baseSize}
+                opacity={1}
+                parentFieldDim={fieldDim}
+                parentFieldOffset={masterBasePosition}
+                parentFocus={0}
+                parentSelected={true}
+                parentLightActive={true}
+                parentSidelined={false}
+                />
+            </Provider>
+            </Canvas>
+        </div>
     )
 }
 
 const mapStateToProps = state => ({
     view: state.view.view,
+    hoverActive: state.view.hoverActive,
 
     demoArray: state.stack.demoArray,
     userArray: state.stack.userArray,
@@ -157,6 +160,7 @@ const mapStateToProps = state => ({
 
 Scene.propTypes = {
     view: PropTypes.string,
+    hoverActive: PropTypes.bool,
 
     demoArray: PropTypes.array,
     userArray: PropTypes.array,

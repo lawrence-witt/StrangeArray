@@ -1,4 +1,6 @@
 import { 
+    PREP_FOR_DELETION,
+    
     EXPAND_STACK, 
     COLLAPSE_STACK, 
     ADD_TO_STACK, 
@@ -47,7 +49,9 @@ export const collapseStack = (newRoot, newFieldElements, newFocus) => (dispatch,
     });
 }
 
-export const addToStack = () => (dispatch, getState) => {
+export const addToStack = newElement => (dispatch, getState) => {
+
+    newElement = newElement.type === 'Array' ? [] : newElement;
 
     const currentPath = getState().stack.currentPath.slice();
     const userArray = getState().stack.userArray.slice();
@@ -74,7 +78,7 @@ export const addToStack = () => (dispatch, getState) => {
     }
 
     const pathGen = topRoot.length <= 1 ? ['base', userArray.length] : [...topRoot, topFieldLayer.length];
-    const newUserArray = traverseAdd(currentPath, userArray, 'element');
+    const newUserArray = traverseAdd(currentPath, userArray, newElement);
     const newActiveFieldElements = topRoot.length > 0 ? [...activeFieldElements, pathGen] : activeFieldElements;
     const newTopFieldLayer = topRoot.length > 0 ? [...topFieldLayer, pathGen] : topFieldLayer;
     
@@ -119,5 +123,10 @@ export const removeFromStack = path => (dispatch, getState) => {
             newActiveFieldElements,
             newTopFieldLayer
         }
+    });
+
+    dispatch({
+        type: PREP_FOR_DELETION,
+        payload: null
     });
 }

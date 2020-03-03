@@ -1,4 +1,4 @@
-import { START_TRANSITION, PERSIST_TRANSITION, COMPLETE_TRANSITION, TOGGLE_DELETION } from '../actions/types';
+import { START_TRANSITION, PERSIST_TRANSITION, COMPLETE_TRANSITION, TOGGLE_DELETION, PREP_FOR_DELETION, SET_HOVER } from '../actions/types';
 
 const initialState = {
     view: 'home',
@@ -6,11 +6,19 @@ const initialState = {
     transitionActive: false,
     transitionDestination: '',
 
-    deletionActive: false
+    hoverActive: false,
+
+    deletionActive: false,
+    pendingDeletion: null
 };
 
 export default function(state = initialState, action) {
     switch(action.type) {
+        case SET_HOVER:
+            return {
+                ...state,
+                hoverActive: action.payload
+            }
         case START_TRANSITION:
             return {
                 ...state,
@@ -35,6 +43,11 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 deletionActive: action.payload
+            }
+        case PREP_FOR_DELETION:
+            return {
+                ...state,
+                pendingDeletion: action.payload
             }
         default:
             return state;

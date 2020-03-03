@@ -83,7 +83,6 @@ const CubeGroup = props => {
     useEffect(() => {
         // Transition in the new user or demo array
         if(prevTransitionActive && !transitionActive) {
-            if (depth===0) completeTransition();
             async function staggerTransitionIn () {
                 setGroupPosition(position);
                 depth===0 ? setChildPositions(raisedPositions) :
@@ -91,8 +90,11 @@ const CubeGroup = props => {
                 setChildSize(cubeElementSize);
                 await delay(300);
                 setSuspended(false);
-                if (depth===0) setChildPositions(defaultPositions);
                 setChildOpacity(1);
+                if (depth===0) {
+                    setChildPositions(defaultPositions);
+                    completeTransition();
+                }
             }
             staggerTransitionIn();
         };
@@ -189,6 +191,7 @@ const CubeGroup = props => {
                         key={nextFieldPaths[i].join(',')}/>
                 ) : (
                     <PrimCube
+                        element={lowerElement}
                         path={nextFieldPaths[i]}
                         parentSidelined={inSidelinedPath}
                         

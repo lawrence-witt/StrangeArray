@@ -8,13 +8,13 @@ import * as THREE from 'three';
 
 // Imported Sheets
 import { usePrevious } from '../../utils/CustomHooks';
-import { removeFromStack } from '../../redux/actions/stackActions';
+import { setHover, prepForDeletion } from '../../redux/actions/viewActions';
 
 const ArrayCube = props => {
     // Parent Props
     let { position, size, opacity, path, depth, selectionHandler, groupSelected, parentSidelined } = props;
     // Redux Props
-    let { dimensions, activeFieldElements, topFieldLayer, removeFromStack, deletionActive} = props;
+    let { dimensions, activeFieldElements, topFieldLayer, prepForDeletion, hoverActive, setHover, deletionActive} = props;
 
     // Geometry Config
     const cubeVertices = [[-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, 0.5], [0.5, 0.5, 0.5]];
@@ -65,16 +65,27 @@ const ArrayCube = props => {
     }, [position, size]);
     
 
-    /* RESPOND TO CLICK EVENT */
+    /* RESPOND TO MOUSE EVENTS */
     const arrayClickHandler = e => {
         if(deletionActive && inTopField) {
             e.stopPropagation();
-            removeFromStack(path);
+            prepForDeletion({type: 'Array', content: path}, path);
         } else if (deletionActive) {
             e.stopPropagation();
         } else if (inActiveField && !parentSidelined) {
             e.stopPropagation();
             selectionHandler();
+        }
+    }
+
+    const hoverHandler = (e, entering) => {
+        if(activityState === 'focussed' || activityState === 'expanded') {
+            e.stopPropagation();
+            if(entering && !hoverActive) {
+                setHover(true);
+            } else if (!entering) {
+                setHover(false);
+            }
         }
     }
 
@@ -86,7 +97,7 @@ const ArrayCube = props => {
     });
 
     return (
-        <a.instancedMesh position={aProps.cPosition} scale={aProps.cSize} onClick={e => arrayClickHandler(e)}>
+        <a.mesh position={aProps.cPosition} scale={aProps.cSize} onPointerMove={e => hoverHandler(e, true)} onPointerOut={e => hoverHandler(e, false)} onClick={e => arrayClickHandler(e)}>
             <mesh>
                 <geometry attach="geometry" vertices={vertices} faces={appliedFloorF} onUpdate={self => self.computeFaceNormals()}/>
                 <a.meshPhongMaterial attach="material" color="grey" transparent opacity={aProps.cOpacity} side={THREE.FrontSide} />
@@ -99,11 +110,12 @@ const ArrayCube = props => {
                 <geometry attach="geometry" vertices={vertices} faces={appliedFloorF} onUpdate={self => self.computeFaceNormals()}/>
                 <a.meshPhongMaterial attach="material" color="grey" transparent opacity={aProps.cOpacity} side={THREE.BackSide} />
             </mesh>
-        </a.instancedMesh>
+        </a.mesh>
     )
 }
 
 const mapStateToProps = state => ({
+    hoverActive: state.view.hoverActive,
     deletionActive: state.view.deletionActive,
 
     dimensions: state.stack.dimensions,
@@ -117,4 +129,4 @@ const mapStateToProps = state => ({
     topFieldLayer: state.stack.topFieldLayer
 });
 
-export default connect(mapStateToProps, { removeFromStack })(ArrayCube);
+export default connect(mapStateToProps, { setHover, prepForDeletion })(ArrayCube);

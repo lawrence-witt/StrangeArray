@@ -1,13 +1,10 @@
 // View Actions
+export const SET_HOVER = 'SET_HOVER';
 export const START_TRANSITION = 'START_TRANSITION';
 export const PERSIST_TRANSITION = 'PERSIST_TRANSITION';
 export const COMPLETE_TRANSITION = 'COMPLETE_TRANSITION';
 export const TOGGLE_DELETION = 'TOGGLE_DELETION';
-
-// Array Actions
-export const ADD_TO_ARRAY = 'ADD_TO_ARRAY';
-export const DELETE_FROM_ARRAY = 'DELETE_FROM_ARRAY';
-export const UPDATE_PATH = 'UPDATE_PATH';
+export const PREP_FOR_DELETION = 'PREP_FOR_DELETION';
 
 // Stack Actions
 export const EXPAND_STACK = 'EXPAND_STACK';

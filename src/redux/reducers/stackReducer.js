@@ -1,9 +1,7 @@
 import { EXPAND_STACK, COLLAPSE_STACK, ADD_TO_STACK, REMOVE_FROM_STACK, CLEAR_STACK } from '../actions/types';
 
 const initialState = {
-    demoArray: [[[[[[[1]]]]]]],
-    //userArray: [[1, [2, 3]], 4, 5, [6, [7, 8]]],
-    //userArray: [1, [2, 3]],
+    demoArray: [[[[[[[{type: 'Boolean', content: true}]]]]]]],
     userArray: [],
     currentPath: [],
     dimensions: 6,

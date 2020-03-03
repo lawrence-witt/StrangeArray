@@ -14,9 +14,7 @@ function App() {
     <Provider store={store}>
       <main className="app">
         <Overlay />
-        <div className="canvas-container">
-          <Scene />
-        </div>
+        <Scene />
       </main>
     </Provider>
   );
