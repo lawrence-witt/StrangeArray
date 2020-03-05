@@ -8,13 +8,14 @@ import * as THREE from 'three';
 
 // Imported Sheets
 import { usePrevious } from '../../utils/CustomHooks';
-import { setHover, prepForDeletion } from '../../redux/actions/viewActions';
+import IndexMarker from './IndexMarker';
+import { setHover, prepForDeletion, unfocusElements } from '../../redux/actions/viewActions';
 
 const ArrayCube = props => {
     // Parent Props
-    let { position, size, opacity, path, depth, selectionHandler, groupSelected, parentSidelined } = props;
+    let { position, size, opacity, path, depth, selectionHandler, parentSelected, inActiveRoots, inActiveField, inTopField, isOverridden, font, index } = props;
     // Redux Props
-    let { dimensions, activeFieldElements, topFieldLayer, prepForDeletion, hoverActive, setHover, deletionActive} = props;
+    let { view, dimensions, prepForDeletion, hoverActive, setHover, unfocusElements, deletionActive, pendingDeletion} = props;
 
     // Geometry Config
     const cubeVertices = [[-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, 0.5], [0.5, 0.5, 0.5]];
@@ -32,21 +33,19 @@ const ArrayCube = props => {
 
 
     /* RESPOND TO REDUX CHANGES */
-    const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
-    const inTopField = useMemo(() => topFieldLayer.some(el => el.join(',') === path.join(',')), [topFieldLayer]);
-
-    const [activityState, setActivityState] = useState('collapsed')
+    const [displayState, setdisplayState] = useState('collapsed');
+    const [highlighted, setHighlighted] = useState(false);
     const [relativeStrength, setRelativeStrength] = useState(0);
 
     useEffect(() => {
         inTopField ? 
-            setActivityState('focussed') :
-        inActiveField && groupSelected ?
-            setActivityState('expanded') :
-        parentSidelined ?
-            setActivityState('overriden') :
-            setActivityState('collapsed');
-    }, [inActiveField, inTopField, groupSelected, parentSidelined]);
+            setdisplayState('focussed') :
+        inActiveRoots ?
+            setdisplayState('expanded') :
+        isOverridden ?
+            setdisplayState('overridden') :
+            setdisplayState('collapsed');
+    }, [inActiveRoots, inTopField, isOverridden]);
 
     useEffect(() => {
         const newStrength = 1 - (1/dimensions)*depth === 0 ? 10 :
@@ -54,6 +53,21 @@ const ArrayCube = props => {
         setRelativeStrength(newStrength);
     }, [dimensions]);
 
+    // Unhighlight self when another cube is selected/unselected for deletion
+    // This is broken, does not work the same way as primCube for some reason
+    useEffect(() => {
+        if(!deletionActive || 
+           !pendingDeletion || 
+           path.join(',') !== pendingDeletion.path.join(',')) {
+            setHighlighted(false);
+        }
+    }, [deletionActive, pendingDeletion]);
+
+    // Alter the cube position based on changes to highlight state
+    useEffect(() => {
+        highlighted ? setCubePosition([position[0], position[1]*1.2, position[2]]) : setCubePosition(position);
+    }, [highlighted]);
+    
 
     /* RESPOND TO PARENT CHANGES */
     const [cubePosition, setCubePosition] = useState(position);
@@ -68,18 +82,30 @@ const ArrayCube = props => {
     /* RESPOND TO MOUSE EVENTS */
     const arrayClickHandler = e => {
         if(deletionActive && inTopField) {
+
             e.stopPropagation();
-            prepForDeletion({type: 'Array', content: path}, path);
+            if(inTopField && !highlighted) {
+                setHighlighted(true);
+                prepForDeletion({type: 'Array', content: path}, path);
+            } else if(inTopField && highlighted) {
+                setHighlighted(false);
+                prepForDeletion(null, null, true);
+            }
+
         } else if (deletionActive) {
+
             e.stopPropagation();
-        } else if (inActiveField && !parentSidelined) {
+
+        } else if (inActiveField && !isOverridden) {
+
             e.stopPropagation();
+            unfocusElements();
             selectionHandler();
         }
     }
 
     const hoverHandler = (e, entering) => {
-        if(activityState === 'focussed' || activityState === 'expanded') {
+        if(displayState === 'focussed' || displayState === 'expanded') {
             e.stopPropagation();
             if(entering && !hoverActive) {
                 setHover(true);
@@ -93,11 +119,16 @@ const ArrayCube = props => {
     const aProps = useSpring({
         cPosition: cubePosition,
         cSize: cubeSize,
-        cOpacity: activityState === 'overriden' ? 0.2 : opacity
+        cOpacity: displayState === 'overridden' ? 0.2 : opacity
     });
 
     return (
-        <a.mesh position={aProps.cPosition} scale={aProps.cSize} onPointerMove={e => hoverHandler(e, true)} onPointerOut={e => hoverHandler(e, false)} onClick={e => arrayClickHandler(e)}>
+        <a.mesh 
+          position={aProps.cPosition} 
+          scale={aProps.cSize} 
+          onPointerMove={e => hoverHandler(e, true)} 
+          onPointerOut={e => hoverHandler(e, false)} 
+          onClick={e => arrayClickHandler(e)}>
             <mesh>
                 <geometry attach="geometry" vertices={vertices} faces={appliedFloorF} onUpdate={self => self.computeFaceNormals()}/>
                 <a.meshPhongMaterial attach="material" color="grey" transparent opacity={aProps.cOpacity} side={THREE.FrontSide} />
@@ -110,13 +141,18 @@ const ArrayCube = props => {
                 <geometry attach="geometry" vertices={vertices} faces={appliedFloorF} onUpdate={self => self.computeFaceNormals()}/>
                 <a.meshPhongMaterial attach="material" color="grey" transparent opacity={aProps.cOpacity} side={THREE.BackSide} />
             </mesh>
+            {displayState !== 'overridden' && depth !== 0 && parentSelected && view !== 'home' ? (
+                <IndexMarker font={font} index={index} cubeSize={cubeSize}/>
+            ) : null}
         </a.mesh>
     )
 }
 
 const mapStateToProps = state => ({
+    view: state.view.view,
     hoverActive: state.view.hoverActive,
     deletionActive: state.view.deletionActive,
+    pendingDeletion: state.view.pendingDeletion,
 
     dimensions: state.stack.dimensions,
 
@@ -129,4 +165,4 @@ const mapStateToProps = state => ({
     topFieldLayer: state.stack.topFieldLayer
 });
 
-export default connect(mapStateToProps, { setHover, prepForDeletion })(ArrayCube);
+export default connect(mapStateToProps, { setHover, prepForDeletion, unfocusElements })(ArrayCube);

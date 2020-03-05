@@ -103,14 +103,19 @@ const Scene = props => {
     const baseSize = new Array(3).fill(baseFieldSize-unitPadPerc);
     const fieldDim = Math.ceil(Math.sqrt(currentArray.length));
 
+    // Swap out the arrays during view transition
     useEffect(() => {
         view === 'edit' ? setCurrentArray(userArray) : 
                           setCurrentArray(demoArray);
     }, [view]);
 
+    // Update the active array when its elements change
     useEffect(() => {
         if (view === 'edit') setCurrentArray(userArray);
     }, [userArray])
+
+    // Load Font
+    const font = useLoader(THREE.FontLoader, '../fonts/Consolas_Regular.typeface.json');
 
     return (
         <div className={`canvas-container ${hoverActive ? 'hovered' : ''}`}>
@@ -127,6 +132,7 @@ const Scene = props => {
                 path={['base']}
                 depth={0}
                 currentFieldPaths={[['base']]}
+                index={'base'}
 
                 position={masterBasePosition}
                 size={baseSize}
@@ -137,6 +143,7 @@ const Scene = props => {
                 parentSelected={true}
                 parentLightActive={true}
                 parentSidelined={false}
+                font={font}
                 />
             </Provider>
             </Canvas>

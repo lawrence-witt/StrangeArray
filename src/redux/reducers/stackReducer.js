@@ -1,8 +1,13 @@
-import { EXPAND_STACK, COLLAPSE_STACK, ADD_TO_STACK, REMOVE_FROM_STACK, CLEAR_STACK } from '../actions/types';
+import { 
+    EXPAND_STACK, 
+    COLLAPSE_STACK, 
+    ADD_TO_STACK, 
+    REMOVE_FROM_STACK, 
+    CLEAR_STACK } from '../actions/types';
 
 const initialState = {
     demoArray: [[[[[[[{type: 'Boolean', content: true}]]]]]]],
-    userArray: [],
+    userArray: [{type: 'Object', content: '{"test": "test"}'}, {type: 'Number', content: 6}],
     currentPath: [],
     dimensions: 6,
 

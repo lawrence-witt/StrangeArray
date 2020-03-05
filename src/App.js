@@ -1,5 +1,5 @@
 // Dependencies
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { Provider } from 'react-redux';
 
 // Imported Sheets
@@ -14,7 +14,9 @@ function App() {
     <Provider store={store}>
       <main className="app">
         <Overlay />
-        <Scene />
+        <Suspense fallback={null}>
+          <Scene />
+        </Suspense>
       </main>
     </Provider>
   );

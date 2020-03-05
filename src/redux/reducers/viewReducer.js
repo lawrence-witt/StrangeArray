@@ -1,4 +1,12 @@
-import { START_TRANSITION, PERSIST_TRANSITION, COMPLETE_TRANSITION, TOGGLE_DELETION, PREP_FOR_DELETION, SET_HOVER } from '../actions/types';
+import {
+    SET_HOVER, 
+    FOCUS_ELEMENT, 
+    UNFOCUS_ELEMENTS, 
+    START_TRANSITION, 
+    PERSIST_TRANSITION, 
+    COMPLETE_TRANSITION, 
+    TOGGLE_DELETION, 
+    PREP_FOR_DELETION,  } from '../actions/types';
 
 const initialState = {
     view: 'home',
@@ -7,6 +15,9 @@ const initialState = {
     transitionDestination: '',
 
     hoverActive: false,
+
+    focusActive: false,
+    focussedElement: {element: null, path: null},
 
     deletionActive: false,
     pendingDeletion: null
@@ -18,6 +29,17 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 hoverActive: action.payload
+            }
+        case FOCUS_ELEMENT:
+            return {
+                ...state,
+                focusActive: action.payload.activity,
+                focussedElement: { element: action.payload.element, path: action.payload.path }
+            }
+        case UNFOCUS_ELEMENTS:
+            return {
+                ...state,
+                focusActive: false
             }
         case START_TRANSITION:
             return {

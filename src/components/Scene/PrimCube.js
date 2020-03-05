@@ -7,26 +7,55 @@ import { useSpring, a } from 'react-spring/three';
 import delay from 'delay';
 import * as THREE from 'three';
 
-import { setHover } from '../../redux/actions/viewActions';
-import { prepForDeletion } from '../../redux/actions/viewActions';
+import { usePrevious } from '../../utils/CustomHooks';
+import { setHover, prepForDeletion, focusElement, unfocusElements } from '../../redux/actions/viewActions';
+import IndexMarker from './IndexMarker';
 
 const PrimCube = props => {
-    const {position, size, opacity, path, element, parentSidelined} = props;
-    const {deletionActive, hoverActive, setHover, prepForDeletion, activeFieldElements, topFieldLayer} = props;
+    // Parent props
+    const {element, index, position, size, opacity, path, groupSelected, parentOverridden, font} = props;
+    // Redux Props
+    const {view, deletionActive, pendingDeletion, hoverActive, focusActive, focussedElement, activeFieldElements, topFieldLayer} = props;
+    // Redux Actions
+    const {setHover, focusElement, unfocusElements, prepForDeletion} = props;
 
     /* RESPOND TO REDUX CHANGES */
-    const [activityState, setActivityState] = useState('collapsed');
+    const [displayState, setDisplayState] = useState('collapsed');
+    const [highlighted, setHighlighted] = useState(false);
 
     const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
     const inTopField = useMemo(() => topFieldLayer.some(el => el.join(',') === path.join(',')), [topFieldLayer]);
 
+    // Set display state
     useEffect(() => {
         inTopField ?
-            setActivityState('focussed') :
-        (inActiveField && !inTopField) || parentSidelined ?
-            setActivityState('overriden') :
-            setActivityState('collapsed');
-    }, [inActiveField, inTopField, parentSidelined]);
+            setDisplayState('topLayer') :
+        (inActiveField && !inTopField) || parentOverridden ?
+            setDisplayState('overriden') :
+            setDisplayState('collapsed');
+    }, [inActiveField, inTopField, parentOverridden]);
+
+    // Unhighlight self when another cube is selected/unselected for focus
+    useEffect(() => {
+        if(!focusActive ||
+            path.join(',') !== focussedElement.path.join(',')) {
+            setHighlighted(false);
+        }
+    }, [focusActive, focussedElement])
+
+    // Unhighlight self when another cube is selected/unselected for deletion
+    useEffect(() => {
+        if(!deletionActive || 
+           !pendingDeletion || 
+           path.join(',') !== pendingDeletion.path.join(',')) {
+            setHighlighted(false);
+        }
+    }, [deletionActive, pendingDeletion]);
+
+    // Alter the cube position based on changes to highlight state
+    useEffect(() => {
+        highlighted ? setCubePosition([position[0], position[1]*1.2, position[2]]) : setCubePosition(position);
+    }, [highlighted]);
 
 
     /* RESPOND TO PARENT CHANGES */
@@ -49,7 +78,7 @@ const PrimCube = props => {
             case 'Undefined':
                 return new THREE.Color('dimgray');
         }
-    }, [element])
+    }, [element]);
 
     useEffect(() => {
         setCubePosition(position);
@@ -59,16 +88,34 @@ const PrimCube = props => {
 
     /* RESPOND TO MOUSE EVENTS */
     const primClickHandler = e => {
-        if(deletionActive && inTopField) {
+        if(deletionActive) {
+
             e.stopPropagation();
-            prepForDeletion(element, path);
-        } else if(deletionActive) {
+            if(inTopField && !highlighted) {
+                setHighlighted(true);
+                prepForDeletion(element, path);
+            } else if(inTopField && highlighted) {
+                setHighlighted(false);
+                prepForDeletion(null, null, true);
+            }
+
+        } else if(!highlighted && inTopField) {
+
             e.stopPropagation();
+            setHighlighted(true);
+            focusElement(element, path);
+
+        } else if(highlighted) {
+
+            e.stopPropagation();
+            setHighlighted(false);
+            unfocusElements();
+
         }
     }
 
     const hoverHandler = (e, entering) => {
-        if(activityState === 'focussed') {
+        if(displayState === 'topLayer') {
             e.stopPropagation();
             if(entering && !hoverActive) {
                 setHover(true);
@@ -82,31 +129,47 @@ const PrimCube = props => {
     const aProps = useSpring({
         cPosition: cubePosition,
         cSize: cubeSize,
-        cOpacity: activityState === 'overriden' ? 0.2 : opacity
+        cOpacity: displayState === 'overriden' ? 0.2 : opacity
     });
 
     return (
-        <a.mesh position={aProps.cPosition} scale={aProps.cSize} onPointerMove={e => hoverHandler(e, true)} onPointerOut={e => hoverHandler(e, false)} onClick={e => primClickHandler(e)}>
+        <a.mesh 
+          position={aProps.cPosition} 
+          scale={aProps.cSize} 
+          onPointerMove={e => hoverHandler(e, true)} 
+          onPointerOut={e => hoverHandler(e, false)} 
+          onClick={e => primClickHandler(e)}>
             <boxBufferGeometry attach="geometry" args={[1, 1, 1]}/>
             <a.meshPhongMaterial attach="material" transparent color={cubeColor} opacity={aProps.cOpacity}/>
+            
+            {displayState === 'topLayer' && groupSelected && view !== 'home' ? (
+                <IndexMarker font={font} index={index} cubeSize={cubeSize}/>
+            ) : null}
+
         </a.mesh>
     )
 }
 
 const mapStateToProps = state => ({
+    view: state.view.view,
     hoverActive: state.view.hoverActive,
+    focusActive: state.view.focusActive,
+    focussedElement: state.view.focussedElement,
     deletionActive: state.view.deletionActive,
+    pendingDeletion: state.view.pendingDeletion,
 
     activeFieldElements: state.stack.activeFieldElements,
     topFieldLayer: state.stack.topFieldLayer
 });
 
 PrimCube.propTypes = {
+    view: PropTypes.string,
     hoverActive: PropTypes.bool,
+    focussedElement: PropTypes.object,
     deletionActive: PropTypes.bool,
 
     activeFieldElements: PropTypes.array,
     topFieldLayer: PropTypes.array
 };
 
-export default connect(mapStateToProps, { prepForDeletion, setHover })(PrimCube);
+export default connect(mapStateToProps, { prepForDeletion, setHover, focusElement, unfocusElements })(PrimCube);

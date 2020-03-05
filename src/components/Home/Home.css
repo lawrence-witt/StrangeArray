@@ -9,6 +9,7 @@
 }
 
 .title {
+    color: white;
     margin-top: 1rem;
     text-align: center;
     top: 0;
@@ -19,7 +20,7 @@
 .h-buttons {
     margin-bottom: 1rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     width: 100%;
     max-width: 300px;

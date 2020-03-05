@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import './AddModal.css';
+import { usePrevious } from '../../../utils/CustomHooks';
 import { addToStack } from '../../../redux/actions/stackActions';
 import TypeSelector from './TypeSelector/TypeSelector';
 import InputSelector from './InputSelector/InputSelector';
@@ -31,6 +32,7 @@ const AddModal = props => {
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
     const [modalActive, setModalActive] = useState(false);
     const [modalEntering, setModalEntering] = useState(false);
+    const prevEntering = usePrevious(modalEntering);
 
     useEffect(() => {
         opened ? setModalEntering(true) : setModalEntering(false);
@@ -42,7 +44,7 @@ const AddModal = props => {
 
     const modalSpring = useSpring({
         transform: modalEntering ? 'translateY(0%)' : 'translateY(-100%)',
-        onRest: () => {if(!modalEntering) {
+        onRest: () => {if(!modalEntering && prevEntering) {
             setModalActive(false);
             setModalStage('typeSelector');
             setDataModel({type: null, input: null, content: null, error: ''});
@@ -94,7 +96,6 @@ const AddModal = props => {
                     return;
                 } else {
                     validated = true;
-                    submitModel.content = submitModel.content === 'true' ? true : false;
                 }
                 break;
             case null:

@@ -46,8 +46,8 @@ const InputSelector = props => {
                             handleInput(e.target.value)
                         }}>
                             <option value="select" disabled>Select...</option>
-                            <option value={'true'}>True</option>
-                            <option value={'false'}>False</option>
+                            <option value='True'>True</option>
+                            <option value='False'>False</option>
                         </select> : null}
                 </div>
 
