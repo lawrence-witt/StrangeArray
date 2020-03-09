@@ -1,0 +1,36 @@
+.swap-modal {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    height: 25%;
+    background-color: grey;
+    z-index: 2;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.swap-title {
+    flex: 1;
+}
+
+.swap-selection-container {
+    flex: 2;
+    width: 100%;
+}
+
+    .swap-selection {
+        display: inline-block;
+        width: 50%;
+    }
+
+.swap-button-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

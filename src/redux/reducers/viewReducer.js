@@ -1,12 +1,19 @@
 import {
-    SET_HOVER, 
+    SET_HOVER,
+
     FOCUS_ELEMENT, 
-    UNFOCUS_ELEMENTS, 
+    UNFOCUS_ELEMENTS,
+
     START_TRANSITION, 
     PERSIST_TRANSITION, 
-    COMPLETE_TRANSITION, 
+    COMPLETE_TRANSITION,
+
     TOGGLE_DELETION, 
-    PREP_FOR_DELETION,  } from '../actions/types';
+    PREP_FOR_DELETION,
+
+    TOGGLE_SWAP,
+    PREP_FOR_SWAP,
+    RESET_SWAP } from '../actions/types';
 
 const initialState = {
     view: 'home',
@@ -17,10 +24,26 @@ const initialState = {
     hoverActive: false,
 
     focusActive: false,
-    focussedElement: {element: null, path: null},
+    focussedElement: {
+        element: null, 
+        path: null
+    },
 
     deletionActive: false,
-    pendingDeletion: null
+    pendingDeletion: null,
+
+    swapActive: false,
+    pendingSwap: {
+        0: {
+            element: null,
+            path: [],
+        },
+        1: {
+            element: null,
+            path: []
+        },
+        stage: 0
+    }
 };
 
 export default function(state = initialState, action) {
@@ -70,6 +93,21 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 pendingDeletion: action.payload
+            }
+        case TOGGLE_SWAP:
+            return {
+                ...state,
+                swapActive: action.payload
+            }
+        case PREP_FOR_SWAP:
+            return {
+                ...state,
+                pendingSwap: action.payload
+            }
+        case RESET_SWAP:
+            return {
+                ...state,
+                pendingSwap: initialState.pendingSwap
             }
         default:
             return state;

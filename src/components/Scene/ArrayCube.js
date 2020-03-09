@@ -9,13 +9,15 @@ import * as THREE from 'three';
 // Imported Sheets
 import { usePrevious } from '../../utils/CustomHooks';
 import IndexMarker from './IndexMarker';
-import { setHover, prepForDeletion, unfocusElements } from '../../redux/actions/viewActions';
+import { setHover, prepForDeletion, unfocusElements, prepForSwap } from '../../redux/actions/viewActions';
 
 const ArrayCube = props => {
     // Parent Props
-    let { position, size, opacity, path, depth, selectionHandler, parentSelected, inActiveRoots, inActiveField, inTopField, isOverridden, font, index } = props;
+    let { element, position, size, opacity, path, depth, stackHandler, setGroupPosition, parentSelected, inActiveRoots, inActiveField, inTopField, isOverridden, font, index } = props;
     // Redux Props
-    let { view, dimensions, prepForDeletion, hoverActive, setHover, unfocusElements, deletionActive, pendingDeletion} = props;
+    let { view, dimensions, hoverActive, deletionActive, pendingDeletion, swapActive, pendingSwap } = props;
+    // Redux Actions
+    let { setHover, unfocusElements, prepForDeletion, prepForSwap } = props;
 
     // Geometry Config
     const cubeVertices = [[-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, 0.5], [0.5, 0.5, 0.5]];
@@ -54,7 +56,6 @@ const ArrayCube = props => {
     }, [dimensions]);
 
     // Unhighlight self when another cube is selected/unselected for deletion
-    // This is broken, does not work the same way as primCube for some reason
     useEffect(() => {
         if(!deletionActive || 
            !pendingDeletion || 
@@ -63,10 +64,21 @@ const ArrayCube = props => {
         }
     }, [deletionActive, pendingDeletion]);
 
+    // Unhighlight self when another cube is selected/unselected for swap
+    useEffect(() => {
+        if(!swapActive ||
+            path.join(',') !== pendingSwap[0].path.join(',') &&
+            path.join(',') !== pendingSwap[1].path.join(',')) {
+                setHighlighted(false);
+            }
+    }, [swapActive, pendingSwap]);
+
     // Alter the cube position based on changes to highlight state
     useEffect(() => {
-        highlighted ? setCubePosition([position[0], position[1]*1.2, position[2]]) : setCubePosition(position);
-    }, [highlighted]);
+        highlighted ? 
+            setGroupPosition([position[0], position[1]+size[1]/2, position[2]]) : 
+            setGroupPosition(position);
+    }, [highlighted])
     
 
     /* RESPOND TO PARENT CHANGES */
@@ -84,23 +96,34 @@ const ArrayCube = props => {
         if(deletionActive && inTopField) {
 
             e.stopPropagation();
-            if(inTopField && !highlighted) {
+            if(!highlighted) {
                 setHighlighted(true);
                 prepForDeletion({type: 'Array', content: path}, path);
-            } else if(inTopField && highlighted) {
+            } else if(highlighted) {
                 setHighlighted(false);
                 prepForDeletion(null, null, true);
             }
 
-        } else if (deletionActive) {
+        } else if(swapActive) {
+
+            e.stopPropagation();
+            if(inTopField && !highlighted) {
+                setHighlighted(true);
+                prepForSwap({type: 'Array', content: element}, path);
+            } else if(inTopField && highlighted) {
+                setHighlighted(false);
+                prepForSwap({type: 'Array', content: element}, path, false);
+            }
+
+        } else if(deletionActive) {
 
             e.stopPropagation();
 
-        } else if (inActiveField && !isOverridden) {
+        } else if(inActiveField && !isOverridden) {
 
             e.stopPropagation();
             unfocusElements();
-            selectionHandler();
+            stackHandler();
         }
     }
 
@@ -153,6 +176,8 @@ const mapStateToProps = state => ({
     hoverActive: state.view.hoverActive,
     deletionActive: state.view.deletionActive,
     pendingDeletion: state.view.pendingDeletion,
+    swapActive: state.view.swapActive,
+    pendingSwap: state.view.pendingSwap,
 
     dimensions: state.stack.dimensions,
 
@@ -165,4 +190,4 @@ const mapStateToProps = state => ({
     topFieldLayer: state.stack.topFieldLayer
 });
 
-export default connect(mapStateToProps, { setHover, prepForDeletion, unfocusElements })(ArrayCube);
+export default connect(mapStateToProps, { setHover, prepForDeletion, unfocusElements, prepForSwap })(ArrayCube);

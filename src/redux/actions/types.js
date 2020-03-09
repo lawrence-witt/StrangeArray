@@ -1,17 +1,24 @@
 // View Actions
 export const SET_HOVER = 'SET_HOVER';
+
 export const FOCUS_ELEMENT = 'FOCUS_ELEMENT';
 export const UNFOCUS_ELEMENTS = 'UNFOCUS_ELEMENTS';
+
 export const START_TRANSITION = 'START_TRANSITION';
 export const PERSIST_TRANSITION = 'PERSIST_TRANSITION';
 export const COMPLETE_TRANSITION = 'COMPLETE_TRANSITION';
+
 export const TOGGLE_DELETION = 'TOGGLE_DELETION';
 export const PREP_FOR_DELETION = 'PREP_FOR_DELETION';
+
+export const TOGGLE_SWAP = 'TOGGLE_SWAP';
+export const PREP_FOR_SWAP = 'PREP_FOR_SWAP';
+export const RESET_SWAP = 'RESET_SWAP';
 
 // Stack Actions
 export const EXPAND_STACK = 'EXPAND_STACK';
 export const COLLAPSE_STACK = 'COLLAPSE_STACK';
 export const ADD_TO_STACK = 'ADD_TO_STACK';
 export const REMOVE_FROM_STACK = 'REMOVE_FROM_STACK';
-export const INSERT_STACK = 'INSERT_STACK';
+export const SWAP_STACK = 'SWAP_STACK';
 export const CLEAR_STACK = 'CLEAR_STACK';

@@ -4,7 +4,8 @@ import {
     EXPAND_STACK, 
     COLLAPSE_STACK, 
     ADD_TO_STACK, 
-    REMOVE_FROM_STACK } from './types';
+    REMOVE_FROM_STACK,
+    SWAP_STACK } from './types';
 
 export const expandStack = (newRoot, newFieldElements, newFocus) => (dispatch, getState) => {
     
@@ -53,12 +54,12 @@ export const addToStack = newElement => (dispatch, getState) => {
 
     newElement = newElement.type === 'Array' ? [] : newElement;
 
-    const currentPath = getState().stack.currentPath.slice();
-    const userArray = getState().stack.userArray.slice();
+    const _currentPath = getState().stack.currentPath.slice();
+    const _userArray = getState().stack.userArray.slice();
 
-    const activeFieldElements = getState().stack.activeFieldElements.slice();
-    const topFieldLayer = getState().stack.topFieldLayer.slice();
-    const topRoot = getState().stack.topRoot.slice();
+    const _activeFieldElements = getState().stack.activeFieldElements.slice();
+    const _topFieldLayer = getState().stack.topFieldLayer.slice();
+    const _topRoot = getState().stack.topRoot.slice();
 
     // Takes in an array of indexes, the multidimensional array of elements it refers to, and a new element to insert. 
     // Traverses the array of elements using the indexPath and pushes the new element at the final index.
@@ -77,10 +78,10 @@ export const addToStack = newElement => (dispatch, getState) => {
         return array;
     }
 
-    const pathGen = topRoot.length <= 1 ? ['base', userArray.length] : [...topRoot, topFieldLayer.length];
-    const newUserArray = traverseAdd(currentPath, userArray, newElement);
-    const newActiveFieldElements = topRoot.length > 0 ? [...activeFieldElements, pathGen] : activeFieldElements;
-    const newTopFieldLayer = topRoot.length > 0 ? [...topFieldLayer, pathGen] : topFieldLayer;
+    const pathGen = _topRoot.length <= 1 ? ['base', _userArray.length] : [..._topRoot, _topFieldLayer.length];
+    const newUserArray = traverseAdd(_currentPath, _userArray, newElement);
+    const newActiveFieldElements = _topRoot.length > 0 ? [..._activeFieldElements, pathGen] : _activeFieldElements;
+    const newTopFieldLayer = _topRoot.length > 0 ? [..._topFieldLayer, pathGen] : _topFieldLayer;
     
     dispatch({
         type: ADD_TO_STACK,
@@ -128,5 +129,36 @@ export const removeFromStack = path => (dispatch, getState) => {
     dispatch({
         type: PREP_FOR_DELETION,
         payload: null
+    });
+}
+
+export const swapStack = () => (dispatch, getState) => {
+
+    const pendingSwap = Object.assign({}, getState().view.pendingSwap);
+    const userArray = getState().stack.userArray.slice();
+
+    if (pendingSwap[0].element.type === 'Array') pendingSwap[0].element = pendingSwap[0].element.content;
+    if (pendingSwap[1].element.type === 'Array') pendingSwap[1].element = pendingSwap[1].element.content;
+
+    function traverseReplace(indexPath, array, element) {
+        const idx = indexPath.shift();
+        if (idx === undefined) return [];
+        if (indexPath.length === 0) {
+            array.splice(idx, 1, element);
+        } else {
+            const [ step ] = array.splice(idx, 1);
+            const next = traverseReplace(indexPath, step, element);
+            array.splice(idx, 0, next);
+        };
+        return array;
+    }
+
+    let newUserArray;
+    newUserArray = traverseReplace(pendingSwap[0].path.slice(1), userArray, pendingSwap[1].element);
+    newUserArray = traverseReplace(pendingSwap[1].path.slice(1), userArray, pendingSwap[0].element);
+
+    dispatch({
+        type: SWAP_STACK,
+        payload: newUserArray
     });
 }

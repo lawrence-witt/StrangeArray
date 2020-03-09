@@ -3,7 +3,8 @@ import {
     COLLAPSE_STACK, 
     ADD_TO_STACK, 
     REMOVE_FROM_STACK, 
-    CLEAR_STACK } from '../actions/types';
+    CLEAR_STACK, 
+    SWAP_STACK} from '../actions/types';
 
 const initialState = {
     demoArray: [[[[[[[{type: 'Boolean', content: true}]]]]]]],
@@ -64,6 +65,11 @@ export default function(state = initialState, action) {
                 userArray: action.payload.newUserArray,
                 activeFieldElements: action.payload.newActiveFieldElements,
                 topFieldLayer: action.payload.newTopFieldLayer
+            }
+        case SWAP_STACK:
+            return {
+                ...state,
+                userArray: action.payload
             }
         case CLEAR_STACK:
             return {

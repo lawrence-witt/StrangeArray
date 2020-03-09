@@ -41,7 +41,7 @@ const DeleteModal = props => {
 
     return modalActive ? (
         <a.div className="delete-modal" style={modalSpring}>
-            <h2>Select An Element</h2>
+            <h2>Select An Element To Delete</h2>
             {pendingDeletion ? (
                 <div className="delete-selection-container">
                     <p className="element-type">{pendingDeletion.element.type}</p>
