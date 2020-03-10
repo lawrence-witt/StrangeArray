@@ -15,7 +15,7 @@ const ArrayCube = props => {
     // Parent Props
     let { element, position, size, opacity, path, depth, stackHandler, setGroupPosition, parentSelected, inActiveRoots, inActiveField, inTopField, isOverridden, font, index } = props;
     // Redux Props
-    let { view, dimensions, hoverActive, deletionActive, pendingDeletion, swapActive, pendingSwap } = props;
+    let { view, dimensions, hoverActive, deletionActive, pendingDeletion, swapActive, pendingSwap, controlsActive } = props;
     // Redux Actions
     let { setHover, unfocusElements, prepForDeletion, prepForSwap } = props;
 
@@ -93,6 +93,7 @@ const ArrayCube = props => {
 
     /* RESPOND TO MOUSE EVENTS */
     const arrayClickHandler = e => {
+        if(controlsActive) return;
         if(deletionActive && inTopField) {
 
             e.stopPropagation();
@@ -130,7 +131,7 @@ const ArrayCube = props => {
     const hoverHandler = (e, entering) => {
         if(displayState === 'focussed' || displayState === 'expanded') {
             e.stopPropagation();
-            if(entering && !hoverActive) {
+            if(entering && !hoverActive && !controlsActive) {
                 setHover(true);
             } else if (!entering) {
                 setHover(false);
@@ -178,6 +179,7 @@ const mapStateToProps = state => ({
     pendingDeletion: state.view.pendingDeletion,
     swapActive: state.view.swapActive,
     pendingSwap: state.view.pendingSwap,
+    controlsActive: state.view.controlsActive,
 
     dimensions: state.stack.dimensions,
 

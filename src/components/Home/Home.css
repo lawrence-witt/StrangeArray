@@ -14,7 +14,7 @@
     text-align: center;
     top: 0;
     width: fit-content;
-    z-index: 1;
+    z-index: 2;
 }
 
 .h-buttons {
@@ -23,10 +23,10 @@
     justify-content: space-around;
     align-items: center;
     width: 100%;
-    max-width: 300px;
+    max-width: 400px;
     min-width: fit-content;
     height: 3rem;
-    z-index: 1;
+    z-index: 2;
 }
 
 .h-button {

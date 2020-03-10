@@ -1,0 +1,12 @@
+.controls-modal {
+    position: absolute;
+    width: 100%;
+    max-width: 400px;
+    height: 25%;
+    background-color: grey;
+    z-index: 2;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}

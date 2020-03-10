@@ -7,20 +7,27 @@ import AddModal from './AddModal/AddModal';
 import DeleteModal from './DeleteModal/DeleteModal';
 import FocusModal from './FocusModal/FocusModal';
 import SwapModal from './SwapModal/SwapModal';
-import { startTransition, toggleDeletion, unfocusElements, toggleSwap } from '../../redux/actions/viewActions';
+import DownloadModal from './DownloadModal/DownloadModal';
+import ControlsModal from './ControlsModal/ControlsModal';
+import { startTransition, setUserUpload, toggleDeletion, unfocusElements, toggleSwap, toggleDownload, toggleControls } from '../../redux/actions/viewActions';
+import { setRawUserArray } from '../../redux/actions/stackActions';
 
 const Editor = props => {
-    const { focusActive, deletionActive, startTransition, toggleDeletion, unfocusElements, toggleSwap, swapActive} = props;
+    const { focusActive, deletionActive, startTransition, setUserUpload, toggleDeletion, unfocusElements, toggleSwap, swapActive, setRawUserArray, downloadActive, toggleDownload, toggleControls, controlsActive} = props;
 
     const [editorActive, setEditorActive] = useState(false);
+    const [focusModal, toggleFocusModal] = useState(false);
     const [addModal, toggleAddModal] = useState(false);
     const [deleteModal, toggleDeleteModal] = useState(false);
-    const [focusModal, toggleFocusModal] = useState(false);
     const [swapModal, toggleSwapModal] = useState(false);
+    const [downloadModal, toggleDownloadModal] = useState(false);
+    const [controlsModal, toggleControlsModal] = useState(false);
 
+    // On Mount
     useEffect(() => {
         setEditorActive(true);
-    }, [])
+        setUserUpload(false);
+    }, []);
 
     // Add Modal Handler
     const addHandler = () => {
@@ -34,6 +41,14 @@ const Editor = props => {
             toggleSwapModal(false);
             toggleSwap(false);
         };
+        if(downloadModal) {
+            toggleDownload(false)
+            toggleDownloadModal(false);
+        }
+        if(controlsModal) {
+            toggleControlsModal(false);
+            toggleControls(false);
+        };
     }
 
     // Delete Modal Handler
@@ -46,6 +61,14 @@ const Editor = props => {
             toggleSwapModal(false);
             toggleSwap(false);
         };
+        if(downloadModal) {
+            toggleDownload(false)
+            toggleDownloadModal(false);
+        }
+        if(controlsModal) {
+            toggleControlsModal(false);
+            toggleControls(false);
+        };
     }
 
     // Focus Modal Handler
@@ -54,7 +77,13 @@ const Editor = props => {
         if(focusActive) {
             toggleAddModal(false);
             toggleDeleteModal(false);
+            toggleDeletion(false);
             toggleSwapModal(false);
+            toggleSwap(false);
+            toggleDownloadModal(false);
+            toggleDownload(false);
+            toggleControlsModal(false);
+            toggleControls(false);
         };
     }, [focusActive]);
 
@@ -67,9 +96,68 @@ const Editor = props => {
             toggleDeleteModal(false);
             toggleDeletion(false);
         };
+        if(downloadModal) {
+            toggleDownload(false)
+            toggleDownloadModal(false);
+        }
+        if(controlsModal) {
+            toggleControlsModal(false);
+            toggleControls(false);
+        };
         if(focusModal) unfocusElements();
     }
 
+    // Download Modal Handler
+    const downloadHandler = () => {
+        if(downloadModal) {
+            toggleDownload(false)
+            toggleDownloadModal(false);
+        } else {
+            setRawUserArray();
+        }
+    }
+
+    useEffect(() => {
+        if(downloadActive){
+            toggleDownloadModal(true);
+            if(addModal) toggleAddModal(false);
+            if(deleteModal) {
+                toggleDeleteModal(false);
+                toggleDeletion(false);
+            };
+            if(focusModal) unfocusElements();
+            if(controlsModal) {
+                toggleControlsModal(false);
+                toggleControls(false);
+            };
+            if(swapModal) {
+                toggleSwapModal(false);
+                toggleSwap(false);
+            };
+        }
+    }, [downloadActive]);
+
+    // Controls Modal Handler
+    const controlsHandler = () => {
+        toggleControlsModal(!controlsModal);
+        toggleControls(!controlsActive);
+        if(addModal) toggleAddModal(false);
+        if(deleteModal) {
+            toggleDeleteModal(false);
+            toggleDeletion(false);
+        };
+        if(swapModal) {
+            toggleSwapModal(false);
+            toggleSwap(false);
+        };
+        if(downloadModal) {
+            toggleDownload(false)
+            toggleDownloadModal(false);
+        }
+        if(focusModal) unfocusElements();
+    }
+
+    // Exit Handler
     const exitHandler = () => {
         setEditorActive(false);
         if(addModal) toggleAddModal(false);
@@ -81,7 +169,11 @@ const Editor = props => {
         if(swapModal) {
             toggleSwapModal(false);
             toggleSwap(false);
-        }
+        };
+        if(controlsModal) {
+            toggleControlsModal(false);
+            toggleControls(false);
+        };
         startTransition('home');
     }
 
@@ -91,13 +183,16 @@ const Editor = props => {
         <div className="editor-container">
             <AddModal opened={addModal} addHandler={addHandler}/>
             <DeleteModal opened={deleteModal} deleteHandler={deleteHandler}/>
-            <FocusModal opened={focusModal}/>
             <SwapModal opened={swapModal}/>
+            <DownloadModal opened={downloadModal}/>
+            <ControlsModal opened={controlsModal}/>
+            <FocusModal opened={focusModal}/>
             <a.section className="e-buttons" style={buttonSpring}>
                 <button className="e-button" onClick={addHandler}>{addModal ? 'Cancel' : 'Add'}</button>
                 <button className="e-button" onClick={deleteHandler}>{deletionActive ? 'Cancel' : 'Delete'}</button>
                 <button className="e-button" onClick={swapHandler}>{swapActive ? 'Cancel' : 'Swap'}</button>
-                <button className="e-button">Download</button>
+                <button className="e-button" onClick={downloadHandler}>Download</button>
+                <button className="e-button" onClick={controlsHandler}>Controls</button>
                 <button className="e-button" onClick={exitHandler}>Exit</button>
             </a.section>
         </div>
@@ -110,6 +205,8 @@ const mapStateToProps = state => ({
     focussedElement: state.view.focussedElement,
     deletionActive: state.view.deletionActive,
     swapActive: state.view.swapActive,
+    downloadActive: state.view.downloadActive,
+    controlsActive: state.view.controlsActive
 });
 
-export default connect(mapStateToProps, { startTransition, toggleDeletion, unfocusElements, toggleSwap })(Editor);
+export default connect(mapStateToProps, { startTransition, setUserUpload, toggleDeletion, unfocusElements, toggleSwap, setRawUserArray, toggleDownload, toggleControls })(Editor);

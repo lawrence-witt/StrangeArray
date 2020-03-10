@@ -64,7 +64,7 @@ const AddModal = props => {
                 if(!submitModel.content) return;
                 try {
                     const content = JSON.parse(submitModel.content);
-                    if (Array.isArray(content) || typeof content === 'string'){
+                    if (content.constructor !== Object){
                         throw new Error('Expected an Object Literal.');
                     } else {
                         setDataModel({...dataModel, error: ''});

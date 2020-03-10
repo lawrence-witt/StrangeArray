@@ -7,6 +7,7 @@ import {
     START_TRANSITION, 
     PERSIST_TRANSITION, 
     COMPLETE_TRANSITION,
+    SET_USER_UPLOAD,
 
     TOGGLE_DELETION,
     PREP_FOR_DELETION,
@@ -15,7 +16,12 @@ import {
     PREP_FOR_SWAP,
     RESET_SWAP,
 
+    TOGGLE_DOWNLOAD,
+
+    TOGGLE_CONTROLS,
+
     CLEAR_STACK} from './types';
+    
 
 // Set the pointer to cursor on the canvas container when hovering on cube
 export const setHover = bool => dispatch => {
@@ -93,6 +99,15 @@ export const completeTransition = () => dispatch => {
     });
 }
 
+// Notifies the home/edit overlays when user submits custom array
+export const setUserUpload = bool => dispatch => {
+
+    dispatch({
+        type: SET_USER_UPLOAD,
+        payload: bool
+    })
+}
+
 // Toggle the deletion mode which changes cube click behaviour
 export const toggleDeletion = bool => dispatch => {
 
@@ -167,4 +182,20 @@ export const resetSwap = () => dispatch => {
     dispatch({
         type: RESET_SWAP
     });
+}
+
+export const toggleDownload = bool => dispatch => {
+
+    dispatch({
+        type: TOGGLE_DOWNLOAD,
+        payload: bool
+    })
+}
+
+export const toggleControls = bool => dispatch => {
+
+    dispatch({
+        type: TOGGLE_CONTROLS,
+        payload: bool
+    })
 }

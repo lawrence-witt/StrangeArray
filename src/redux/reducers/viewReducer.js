@@ -7,19 +7,25 @@ import {
     START_TRANSITION, 
     PERSIST_TRANSITION, 
     COMPLETE_TRANSITION,
+    SET_USER_UPLOAD,
 
     TOGGLE_DELETION, 
     PREP_FOR_DELETION,
 
     TOGGLE_SWAP,
     PREP_FOR_SWAP,
-    RESET_SWAP } from '../actions/types';
+    RESET_SWAP,
+
+    TOGGLE_DOWNLOAD,
+
+    TOGGLE_CONTROLS} from '../actions/types';
 
 const initialState = {
     view: 'home',
     prevTransitionActive: false,
     transitionActive: false,
     transitionDestination: '',
+    userUpload: false,
 
     hoverActive: false,
 
@@ -43,7 +49,11 @@ const initialState = {
             path: []
         },
         stage: 0
-    }
+    },
+
+    downloadActive: false,
+
+    controlsActive: false
 };
 
 export default function(state = initialState, action) {
@@ -52,17 +62,6 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 hoverActive: action.payload
-            }
-        case FOCUS_ELEMENT:
-            return {
-                ...state,
-                focusActive: action.payload.activity,
-                focussedElement: { element: action.payload.element, path: action.payload.path }
-            }
-        case UNFOCUS_ELEMENTS:
-            return {
-                ...state,
-                focusActive: false
             }
         case START_TRANSITION:
             return {
@@ -83,6 +82,22 @@ export default function(state = initialState, action) {
                 ...state,
                 prevTransitionActive: false,
                 transitionDestination: ''
+            }
+        case SET_USER_UPLOAD:
+            return {
+                ...state,
+                userUpload: action.payload
+            }
+        case FOCUS_ELEMENT:
+            return {
+                ...state,
+                focusActive: action.payload.activity,
+                focussedElement: { element: action.payload.element, path: action.payload.path }
+            }
+        case UNFOCUS_ELEMENTS:
+            return {
+                ...state,
+                focusActive: false
             }
         case TOGGLE_DELETION:
             return {
@@ -108,6 +123,16 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 pendingSwap: initialState.pendingSwap
+            }
+        case TOGGLE_DOWNLOAD:
+            return {
+                ...state,
+                downloadActive: action.payload
+            }
+        case TOGGLE_CONTROLS:
+            return {
+                ...state,
+                controlsActive: action.payload
             }
         default:
             return state;

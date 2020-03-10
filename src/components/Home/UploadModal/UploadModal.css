@@ -1,0 +1,47 @@
+.upload-modal {
+    position: absolute;
+    width: 100%;
+    max-width: 400px;
+    height: 30%;
+    background-color: grey;
+    z-index: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.upload-container {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 3.5rem;
+    width: 100%;
+    height: 100%;
+}
+
+.upload-warning-container {
+    text-align: center;
+    flex: 0.5;
+}
+
+.upload-error-container {
+    text-align: center;
+    flex: 0.5;
+}
+
+.upload-input {
+    flex: 2;
+    resize: none;
+    width: 80%;
+    min-width: 200px;
+    height: 100%;
+}
+
+.upload-button-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

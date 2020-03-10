@@ -100,7 +100,10 @@ const Scene = props => {
 
     const [currentArray, setCurrentArray] = useState(demoArray);
 
-    const baseSize = new Array(3).fill(baseFieldSize-unitPadPerc);
+    // For some reason, this commented out baseSize rules makes lower level arrays collapse 
+    // to the parent in the top level array when adding/deleting an element after UNIT padding update
+    //const baseSize = new Array(3).fill(baseFieldSize-unitPadPerc);
+    const baseSize = new Array(3).fill(baseFieldSize);
     const fieldDim = Math.ceil(Math.sqrt(currentArray.length));
 
     // Swap out the arrays during view transition
@@ -128,22 +131,22 @@ const Scene = props => {
             <SceneLight focusPosition={focusPosition} baseFieldSize={baseFieldSize}/>
             <Provider store={store}>
                 <ConnectedCubeGroup 
-                groupArray={currentArray}
-                path={['base']}
-                depth={0}
-                currentFieldPaths={[['base']]}
-                index={'base'}
+                    groupArray={currentArray}
+                    path={['base']}
+                    depth={0}
+                    currentFieldPaths={[['base']]}
+                    index={'base'}
 
-                position={masterBasePosition}
-                size={baseSize}
-                opacity={1}
-                parentFieldDim={fieldDim}
-                parentFieldOffset={masterBasePosition}
-                parentFocus={0}
-                parentSelected={true}
-                parentLightActive={true}
-                parentSidelined={false}
-                font={font}
+                    position={masterBasePosition}
+                    size={baseSize}
+                    opacity={1}
+                    parentFieldDim={fieldDim}
+                    parentFieldOffset={masterBasePosition}
+                    parentFocus={0}
+                    parentSelected={true}
+                    parentLightActive={true}
+                    parentSidelined={false}
+                    font={font}
                 />
             </Provider>
             </Canvas>

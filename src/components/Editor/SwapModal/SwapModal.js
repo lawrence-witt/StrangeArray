@@ -35,8 +35,6 @@ const SwapModal = props => {
     });
 
     /* SUBMIT SWAP */
-    // This currently works except for arrays which break and turn into primcubes.
-    // The reason being, you are not inserting an actual array but an element object
     function handleSwap() {
         if(pendingSwap[0].element && pendingSwap[1].element) {
             swapStack();

@@ -14,9 +14,7 @@ const TypeSelector = props => {
         "String": "textArea",
         "Boolean": "boolSelect",
         "Number": "text",
-        "BigInt": "bigIntText",
-        "Null": null,
-        "Undefined": null
+        "Null": null
     }
 
     const typeSpring = useSpring({

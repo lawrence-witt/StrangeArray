@@ -1,4 +1,9 @@
-import { 
+import {
+    UPDATE_UNIT_PADDING,
+    UPDATE_LAYER_PADDING,
+    REFOCUS_STACK,
+    SET_CUSTOM_USER_ARRAY,
+    SET_RAW_USER_ARRAY,
     EXPAND_STACK, 
     COLLAPSE_STACK, 
     ADD_TO_STACK, 
@@ -8,7 +13,9 @@ import {
 
 const initialState = {
     demoArray: [[[[[[[{type: 'Boolean', content: true}]]]]]]],
-    userArray: [{type: 'Object', content: '{"test": "test"}'}, {type: 'Number', content: 6}],
+    rawUserArray: '',
+    userArray: [{type: 'Null', content: null}, [{type: 'Number', content: 6}, {type: 'String', content: "hello"}]],
+    /* userArray: [], */
     currentPath: [],
     dimensions: 6,
 
@@ -26,6 +33,32 @@ const initialState = {
 
 export default function(state = initialState, action) {
     switch(action.type) {
+        case UPDATE_UNIT_PADDING:
+            return {
+                ...state,
+                unitPadPerc: action.payload
+            }
+        case UPDATE_LAYER_PADDING: {
+            return {
+                ...state,
+                layerPadPerc: action.payload
+            }
+        }
+        case REFOCUS_STACK:
+            return {
+                ...state,
+                focusPosition: action.payload
+            }
+        case SET_CUSTOM_USER_ARRAY:
+            return {
+                ...state,
+                userArray: action.payload
+            }
+        case SET_RAW_USER_ARRAY:
+            return {
+                ...state,
+                rawUserArray: action.payload
+            }
         case EXPAND_STACK:
             return {
                 ...state,

@@ -64,6 +64,7 @@
 
             .input-box textarea {
                 width: 80%;
+                min-width: 200px;
                 height: 100%;
                 resize: none;
             }

@@ -1,14 +1,125 @@
-import { 
+import {
+    SET_USER_UPLOAD,
     PREP_FOR_DELETION,
+    TOGGLE_DOWNLOAD,
     
+    UPDATE_UNIT_PADDING,
+    UPDATE_LAYER_PADDING,
+    REFOCUS_STACK,
+    SET_CUSTOM_USER_ARRAY,
+    SET_RAW_USER_ARRAY,
     EXPAND_STACK, 
     COLLAPSE_STACK, 
     ADD_TO_STACK, 
     REMOVE_FROM_STACK,
     SWAP_STACK } from './types';
 
-export const expandStack = (newRoot, newFieldElements, newFocus) => (dispatch, getState) => {
+
+export const updateUnitPadding = newValue => dispatch => {
+    dispatch({
+        type: UPDATE_UNIT_PADDING,
+        payload: newValue
+    })
+}
+
+export const updateLayerPadding = newValue => dispatch => {
+    dispatch({
+        type: UPDATE_LAYER_PADDING,
+        payload: newValue
+    })
+}
+
+export const refocusStack = newFocus => (dispatch, getState) => {
+    const currentFocus = getState().stack.focusPosition;
+
+    // This is a temporary fix: the Calculator functions should be reworked during testing
+    newFocus = !newFocus ? [0, 0, 0] : [currentFocus[0], newFocus, currentFocus[2]];
+
+    dispatch({
+        type: REFOCUS_STACK,
+        payload: newFocus
+    })
+}
+
+export const setCustomUserArray = (customArray, reset=false) => dispatch => {
+    const dataModel = (type, content) => ({
+        type,
+        content
+    });
+
+    if (reset) {
+        dispatch({
+            type: SET_CUSTOM_USER_ARRAY,
+            payload: []
+        })
+    } else {
+        function formatArray(array) {
+            return array.map(element => {
+                if(!element) {
+                    return dataModel('Null', null)
+                } else if (Array.isArray(element)) {
+                    return formatArray(element);
+                } else if (element.constructor === Object) {
+                    return dataModel('Object', JSON.stringify(element));
+                } else if (typeof element === 'number') {
+                    return dataModel('Number', element);
+                } else if (typeof element === 'string') {
+                    return dataModel('String', element);
+                } else if (typeof element === 'boolean') {
+                    return dataModel('Boolean', element.toString());
+                };
+            })
+        }
     
+        const formattedArray = formatArray(customArray);
+    
+        dispatch({
+            type: SET_CUSTOM_USER_ARRAY,
+            payload: formattedArray
+        });
+    
+        dispatch({
+            type: SET_USER_UPLOAD,
+            payload: true
+        });
+    }
+}
+
+export const setRawUserArray = () => (dispatch, getState) => {
+    const userArray = getState().stack.userArray.slice();
+
+    function unformatArray(array) {
+        return array.map(element => {
+            if(Array.isArray(element)) {
+                return unformatArray(element);
+            } else if (element.type === 'Null') {
+                return null;
+            } else if (element.type === 'Object') {
+                return JSON.parse(element.content);
+            } else if (element.type === 'Number') {
+                return element.content;
+            } else if (element.type === 'String') {
+                return element.content;
+            } else if (element.type === 'Boolean') {
+                return element.content === 'True' ? true : false;
+            }
+        })
+    }
+
+    const unformattedArray = JSON.stringify(unformatArray(userArray));
+
+    dispatch({
+        type: SET_RAW_USER_ARRAY,
+        payload: unformattedArray
+    });
+
+    dispatch({
+        type: TOGGLE_DOWNLOAD,
+        payload: true
+    })
+}
+
+export const expandStack = (newRoot, newFieldElements, newFocus) => (dispatch, getState) => {
     const currentFocus = getState().stack.focusPosition;
 
     // This is a temporary fix: the Calculator functions should be reworked during testing
@@ -26,7 +137,6 @@ export const expandStack = (newRoot, newFieldElements, newFocus) => (dispatch, g
 }
 
 export const collapseStack = (newRoot, newFieldElements, newFocus) => (dispatch, getState) => {
-
     const activeFieldElements = getState().stack.activeFieldElements.slice();
     const activeRoots = getState().stack.activeRoots.slice();
 
@@ -51,15 +161,14 @@ export const collapseStack = (newRoot, newFieldElements, newFocus) => (dispatch,
 }
 
 export const addToStack = newElement => (dispatch, getState) => {
-
     newElement = newElement.type === 'Array' ? [] : newElement;
 
-    const _currentPath = getState().stack.currentPath.slice();
-    const _userArray = getState().stack.userArray.slice();
+    const currentPath = getState().stack.currentPath.slice();
+    const userArray = getState().stack.userArray.slice();
 
-    const _activeFieldElements = getState().stack.activeFieldElements.slice();
-    const _topFieldLayer = getState().stack.topFieldLayer.slice();
-    const _topRoot = getState().stack.topRoot.slice();
+    const activeFieldElements = getState().stack.activeFieldElements.slice();
+    const topFieldLayer = getState().stack.topFieldLayer.slice();
+    const topRoot = getState().stack.topRoot.slice();
 
     // Takes in an array of indexes, the multidimensional array of elements it refers to, and a new element to insert. 
     // Traverses the array of elements using the indexPath and pushes the new element at the final index.
@@ -78,10 +187,10 @@ export const addToStack = newElement => (dispatch, getState) => {
         return array;
     }
 
-    const pathGen = _topRoot.length <= 1 ? ['base', _userArray.length] : [..._topRoot, _topFieldLayer.length];
-    const newUserArray = traverseAdd(_currentPath, _userArray, newElement);
-    const newActiveFieldElements = _topRoot.length > 0 ? [..._activeFieldElements, pathGen] : _activeFieldElements;
-    const newTopFieldLayer = _topRoot.length > 0 ? [..._topFieldLayer, pathGen] : _topFieldLayer;
+    const pathGen = topRoot.length <= 1 ? ['base', userArray.length] : [...topRoot, topFieldLayer.length];
+    const newUserArray = traverseAdd(currentPath, userArray, newElement);
+    const newActiveFieldElements = topRoot.length > 0 ? [...activeFieldElements, pathGen] : activeFieldElements;
+    const newTopFieldLayer = topRoot.length > 0 ? [...topFieldLayer, pathGen] : topFieldLayer;
     
     dispatch({
         type: ADD_TO_STACK,
@@ -94,7 +203,6 @@ export const addToStack = newElement => (dispatch, getState) => {
 }
 
 export const removeFromStack = path => (dispatch, getState) => {
-
     const userArray = getState().stack.userArray.slice();
     const activeFieldElements = getState().stack.activeFieldElements.slice();
     const topFieldLayer = getState().stack.topFieldLayer.slice();
@@ -133,7 +241,6 @@ export const removeFromStack = path => (dispatch, getState) => {
 }
 
 export const swapStack = () => (dispatch, getState) => {
-
     const pendingSwap = Object.assign({}, getState().view.pendingSwap);
     const userArray = getState().stack.userArray.slice();
 

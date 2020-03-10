@@ -15,7 +15,7 @@ const PrimCube = props => {
     // Parent props
     const {element, index, position, size, opacity, path, groupSelected, parentOverridden, font} = props;
     // Redux Props
-    const {view, deletionActive, pendingDeletion, hoverActive, focusActive, focussedElement, swapActive, pendingSwap, activeFieldElements, topFieldLayer} = props;
+    const {view, deletionActive, pendingDeletion, hoverActive, focusActive, focussedElement, swapActive, pendingSwap, activeFieldElements, topFieldLayer, controlsActive} = props;
     // Redux Actions
     const {setHover, focusElement, unfocusElements, prepForDeletion, prepForSwap} = props;
     
@@ -103,6 +103,7 @@ const PrimCube = props => {
 
     /* RESPOND TO MOUSE EVENTS */
     const primClickHandler = e => {
+        if(controlsActive) return;
         if(deletionActive) {
 
             if(inTopField && !highlighted) {
@@ -147,7 +148,7 @@ const PrimCube = props => {
     const hoverHandler = (e, entering) => {
         if(displayState === 'topLayer') {
             e.stopPropagation();
-            if(entering && !hoverActive) {
+            if(entering && !hoverActive && !controlsActive) {
                 setHover(true);
             } else if (!entering) {
                 setHover(false);
@@ -189,6 +190,7 @@ const mapStateToProps = state => ({
     pendingDeletion: state.view.pendingDeletion,
     swapActive: state.view.swapActive,
     pendingSwap: state.view.pendingSwap,
+    controlsActive: state.view.controlsActive,
 
     activeFieldElements: state.stack.activeFieldElements,
     topFieldLayer: state.stack.topFieldLayer
