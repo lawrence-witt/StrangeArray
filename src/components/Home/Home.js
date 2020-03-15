@@ -15,7 +15,7 @@ const Home = props => {
     // On Mount
     useEffect(() => {
         setActive(true);
-        //setCustomUserArray(null, true);
+        setCustomUserArray(null, true);
     }, []);
 
     // Initiate transition once user upload is stored in state

@@ -36,8 +36,8 @@ const DeleteModal = props => {
 
     /* RESPOND TO CLICK EVENTS */
     const handleDeletion = () => {
-        removeFromStack(pendingDeletion.path);
-    } 
+        removeFromStack();
+    }
 
     return modalActive ? (
         <a.div className="delete-modal" style={modalSpring}>

@@ -42,6 +42,7 @@ const ControlsModal = props => {
 
     /* SLIDERS */
     const handleSlider = e => {
+        e.stopPropagation();
         const slideName = e.target.name;
         const newSlideValue = Number(e.target.value);
 

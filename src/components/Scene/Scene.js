@@ -13,7 +13,9 @@ import * as THREE from 'three';
 // Imported Sheets
 import store from '../../redux/store';
 import ConnectedCubeGroup from './CubeGroup';
-import { getFieldData } from '../../utils/Calculator';
+import PrimCube from './PrimCube';
+import Pedestal from './Pedestal';
+import { getFieldData, compensateFieldPositions } from '../../utils/Calculator';
 import { usePrevious } from '../../utils/CustomHooks';
 
 extend({ OrbitControls });
@@ -30,7 +32,7 @@ const Controls = props => {
     const [ refocusActive, setRefocusActive ] = useState(false);
 
     useEffect(() => {
-        camera.position.set(10, 10, 10);
+        camera.position.set(5, 5, 7);
     }, [])
 
     useEffect(() => {
@@ -96,14 +98,11 @@ const SceneLight = props => {
 
 const Scene = props => {
 
-    const { view, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc} = props;
+    const { view, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc} = props;
 
     const [currentArray, setCurrentArray] = useState(demoArray);
 
-    // For some reason, this commented out baseSize rules makes lower level arrays collapse 
-    // to the parent in the top level array when adding/deleting an element after UNIT padding update
-    //const baseSize = new Array(3).fill(baseFieldSize-unitPadPerc);
-    const baseSize = new Array(3).fill(baseFieldSize);
+    const pedestalSize = [baseFieldSize, baseFieldSize*2, baseFieldSize];
     const fieldDim = Math.ceil(Math.sqrt(currentArray.length));
 
     // Swap out the arrays during view transition
@@ -120,6 +119,8 @@ const Scene = props => {
     // Load Font
     const font = useLoader(THREE.FontLoader, '../fonts/Consolas_Regular.typeface.json');
 
+    const { rawFieldPositions, fieldElementSize } = getFieldData(fieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
+
     return (
         <div className={`canvas-container ${hoverActive ? 'hovered' : ''}`}>
             <Canvas
@@ -127,27 +128,44 @@ const Scene = props => {
                 gl.sortObjects = false;
             }}>
             <Controls focusPosition={focusPosition}/>
-            <ambientLight />
+            <ambientLight/>
             <SceneLight focusPosition={focusPosition} baseFieldSize={baseFieldSize}/>
+            <Pedestal pedestalSize={pedestalSize} fieldElementSize={fieldElementSize} masterBasePosition={masterBasePosition}/>
             <Provider store={store}>
-                <ConnectedCubeGroup 
-                    groupArray={currentArray}
-                    path={['base']}
-                    depth={0}
-                    currentFieldPaths={[['base']]}
-                    index={'base'}
+            {currentArray.map((lowerElement, i) => {
+                return Array.isArray(lowerElement) ? (
+                    <ConnectedCubeGroup 
+                        groupArray={lowerElement}
+                        index={i}
+                        path={[i.toString()]}
+                        depth={1}
+                        currentFieldPaths={currentArray.map((e, i) => [i.toString()])}
+                        position={rawFieldPositions[i].map(vec => vec/2)}
+                        size={fieldElementSize}
+                        opacity={1}
 
-                    position={masterBasePosition}
-                    size={baseSize}
-                    opacity={1}
-                    parentFieldDim={fieldDim}
-                    parentFieldOffset={masterBasePosition}
-                    parentFocus={0}
-                    parentSelected={true}
-                    parentLightActive={true}
-                    parentSidelined={false}
-                    font={font}
-                />
+                        parentSelected={true}
+                        parentOverridden={false}
+                        parentFieldDim={fieldDim}
+                        parentFieldOffset={masterBasePosition}
+                        parentFocus={0}
+                        font={font}
+                        key={[i].join(',')}/>
+                ) : (
+                    <PrimCube
+                        element={lowerElement}
+                        index={i}
+                        path={[i.toString()]}
+                        position={rawFieldPositions[i]}
+                        size={fieldElementSize}
+                        opacity={1}
+
+                        groupSelected={true}
+                        parentOverridden={false}
+                        font={font}
+                        key={[i].join(',')}/>
+                )
+            })}
             </Provider>
             </Canvas>
         </div>

@@ -14,8 +14,8 @@ import {
 const initialState = {
     demoArray: [[[[[[[{type: 'Boolean', content: true}]]]]]]],
     rawUserArray: '',
-    userArray: [{type: 'Null', content: null}, [{type: 'Number', content: 6}, {type: 'String', content: "hello"}]],
-    /* userArray: [], */
+    //userArray: [{type: 'Null', content: null}, [{type: 'Number', content: 6}, {type: 'String', content: "hello"}]],
+    userArray: [],
     currentPath: [],
     dimensions: 6,
 
@@ -25,8 +25,8 @@ const initialState = {
     unitPadPerc: 0.3,
     layerPadPerc: 0.5,
 
-    activeFieldElements: [['base']],
-    topFieldLayer: [['base']],
+    activeFieldElements: [],
+    topFieldLayer: [],
     activeRoots: [],
     topRoot: []
 };
@@ -111,8 +111,8 @@ export default function(state = initialState, action) {
 
                 focusPosition: [0, 0, 0],
 
-                activeFieldElements: [['base']],
-                topFieldLayer: [['base']],
+                activeFieldElements: [],
+                topFieldLayer: [],
                 activeRoots: [],
                 topRoot: []
             }

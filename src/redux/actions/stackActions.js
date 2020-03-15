@@ -128,7 +128,7 @@ export const expandStack = (newRoot, newFieldElements, newFocus) => (dispatch, g
     dispatch({
         type: EXPAND_STACK,
         payload: {
-            newPath: newRoot.slice(1),
+            newPath: newRoot,
             newFocus,
             newFieldElements,
             newRoot
@@ -150,7 +150,7 @@ export const collapseStack = (newRoot, newFieldElements, newFocus) => (dispatch,
     dispatch({
         type: COLLAPSE_STACK,
         payload: {
-            newPath: topRoot.slice(1),
+            newPath: topRoot,
             newFocus,
             newActiveFieldElements,
             newFieldElements,
@@ -187,10 +187,10 @@ export const addToStack = newElement => (dispatch, getState) => {
         return array;
     }
 
-    const pathGen = topRoot.length <= 1 ? ['base', userArray.length] : [...topRoot, topFieldLayer.length];
+    const pathGen = topRoot.length === 0 ? [userArray.length.toString()] : [...topRoot, topFieldLayer.length.toString()];
     const newUserArray = traverseAdd(currentPath, userArray, newElement);
-    const newActiveFieldElements = topRoot.length > 0 ? [...activeFieldElements, pathGen] : activeFieldElements;
-    const newTopFieldLayer = topRoot.length > 0 ? [...topFieldLayer, pathGen] : topFieldLayer;
+    const newActiveFieldElements = [...activeFieldElements, pathGen];
+    const newTopFieldLayer = [...topFieldLayer, pathGen];
     
     dispatch({
         type: ADD_TO_STACK,
@@ -202,13 +202,11 @@ export const addToStack = newElement => (dispatch, getState) => {
     });
 }
 
-export const removeFromStack = path => (dispatch, getState) => {
+export const removeFromStack = () => (dispatch, getState) => {
+    const pendingDeletion = Object.assign({}, getState().view.pendingDeletion);
     const userArray = getState().stack.userArray.slice();
     const activeFieldElements = getState().stack.activeFieldElements.slice();
     const topFieldLayer = getState().stack.topFieldLayer.slice();
-    const topRoot = getState().stack.topRoot.slice();
-
-    path = path.slice(1);
 
     function traverseRemove(indexPath, array) {
         const idx = indexPath.shift();
@@ -221,9 +219,9 @@ export const removeFromStack = path => (dispatch, getState) => {
         return array;
     }
 
-    const newUserArray = traverseRemove(path, userArray);
-    const newActiveFieldElements = topRoot.length > 0 ? activeFieldElements.slice(0, activeFieldElements.length-1) : activeFieldElements;
-    const newTopFieldLayer = topRoot.length > 0 ? topFieldLayer.slice(0, topFieldLayer.length-1) : topFieldLayer;
+    const newUserArray = traverseRemove(pendingDeletion.path, userArray);
+    const newActiveFieldElements = activeFieldElements.slice(0, activeFieldElements.length-1);
+    const newTopFieldLayer = topFieldLayer.slice(0, topFieldLayer.length-1)
     
     dispatch({
         type: REMOVE_FROM_STACK,
@@ -261,8 +259,8 @@ export const swapStack = () => (dispatch, getState) => {
     }
 
     let newUserArray;
-    newUserArray = traverseReplace(pendingSwap[0].path.slice(1), userArray, pendingSwap[1].element);
-    newUserArray = traverseReplace(pendingSwap[1].path.slice(1), userArray, pendingSwap[0].element);
+    newUserArray = traverseReplace(pendingSwap[0].path, userArray, pendingSwap[1].element);
+    newUserArray = traverseReplace(pendingSwap[1].path, userArray, pendingSwap[0].element);
 
     dispatch({
         type: SWAP_STACK,

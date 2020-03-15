@@ -18,7 +18,7 @@ const PrimCube = props => {
     const {view, deletionActive, pendingDeletion, hoverActive, focusActive, focussedElement, swapActive, pendingSwap, activeFieldElements, topFieldLayer, controlsActive} = props;
     // Redux Actions
     const {setHover, focusElement, unfocusElements, prepForDeletion, prepForSwap} = props;
-    
+
 
     /* RESPOND TO REDUX CHANGES */
     const [displayState, setDisplayState] = useState('collapsed');
@@ -89,7 +89,7 @@ const PrimCube = props => {
             case 'BigInt':
                 return new THREE.Color('sandybrown');
             case 'Null':
-                return new THREE.Color('darkgray');
+                return new THREE.Color('dimgray');
             case 'Undefined':
                 return new THREE.Color('dimgray');
         }
@@ -98,7 +98,7 @@ const PrimCube = props => {
     useEffect(() => {
         setCubePosition(position);
         setCubeSize(size);
-    }, [position, size]);
+    }, [...position, ...size]);
 
 
     /* RESPOND TO MOUSE EVENTS */

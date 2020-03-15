@@ -19,7 +19,7 @@ import { persistTransition, completeTransition } from '../../redux/actions/viewA
 
 const CubeGroup = props => {
     // Parent Props
-    const { groupArray, index, path, depth, currentFieldPaths, position, size, opacity, parentSelected, parentLightActive, parentOverridden, parentFieldDim, parentFieldOffset, parentFocus, font } = props;
+    const { groupArray, index, path, depth, currentFieldPaths, position, size, opacity, parentSelected, parentOverridden, parentFieldDim, parentFieldOffset, parentFocus, font } = props;
     // Redux Props
     const { prevTransitionActive, transitionActive, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeFieldElements, topFieldLayer, activeRoots, deletionActive, swapActive, controlsActive, topRoot } = props;
     // Redux Actions
@@ -39,9 +39,7 @@ const CubeGroup = props => {
     const isTopRoot = useMemo(() => topRoot.join(',') === path.join(','), [topRoot]);
     const isOverridden = parentOverridden || (inActiveField && !inTopField && !inActiveRoots);
 
-    const [pointLightActive, setPointLightActive] = useState(false);
-
-    const nextFieldPaths = groupArray.map((e, i) => [...path, i]);
+    const nextFieldPaths = groupArray.map((e, i) => [...path, i.toString()]);
     const nextFocus = parentFocus+(size[1]/2)+(fieldElementSize[1]/2)+layerPadPerc;
     const [groupSelected, setGroupSelected] = useState(false);
     const [suspended, setSuspended] = useState(false);
@@ -58,45 +56,16 @@ const CubeGroup = props => {
 
 
     /* RESPOND TO REDUX CHANGES*/
-    // Respond to Unit padding changes
-    useEffect(() => {
-        if(controlsActive) {
-            setGroupPosition(position);
-            if(inActiveRoots) {
-                setChildSize(fieldElementSize);
-                setChildPositions(trueFieldPositions);
-            } else {
-                setChildSize(cubeElementSize);
-                setChildPositions(defaultPositions);
-            }
-        }
-    }, [unitPadPerc]);
-
-    // Respond to Layer padding changes
-    useEffect(() => {
-        if(controlsActive) {
-            if(isTopRoot) refocusStack(nextFocus);
-            if(inActiveRoots) {
-                setGroupPosition(position);
-                setChildPositions(trueFieldPositions);
-            } else {
-                setGroupPosition(position);
-                setChildPositions(defaultPositions);
-            }
-        }
-    }, [layerPadPerc]);
-
     // Transition out the current user or demo array
     useEffect(() => {
         if(!prevTransitionActive && transitionActive) {
             async function staggerTransitionOut() {
                 setGroupSelected(false);
-                setPointLightActive(false);
                 setChildPositions(raisedPositions);
                 setChildOpacity(0);
                 await delay(500);
                 setSuspended(true);
-                if (depth===0) persistTransition();
+                if (depth===1) persistTransition();
             }
             staggerTransitionOut();
         }
@@ -104,28 +73,38 @@ const CubeGroup = props => {
 
 
     /* RESPOND TO PARENT COMPONENT CHANGES */
+    // Persist new position/size when config dependencies change
     useEffect(() => {
-        if((JSON.stringify(position) !== JSON.stringify(prevPosition)
-           || JSON.stringify(size) !== JSON.stringify(prevSize)) &&
-           !controlsActive) {
-            setGroupPosition(position);
+        setGroupPosition(position);
+        if(!controlsActive){
             setChildPositions(defaultPositions);
             setChildSize(cubeElementSize);
+        } else {
+            if(isTopRoot) refocusStack(nextFocus);
+            if(inActiveRoots) {
+                setGroupPosition(position);
+                setChildSize(fieldElementSize);
+                setChildPositions(trueFieldPositions);
+            } else {
+                setGroupPosition(position);
+                setChildSize(cubeElementSize);
+                setChildPositions(defaultPositions);
+            }
         }
-    }, [position, size]);
+    }, [...position, ...size, layerPadPerc]);
     
     useEffect(() => {
         // Transition in the new user or demo array
         if(prevTransitionActive && !transitionActive) {
             async function staggerTransitionIn () {
                 setGroupPosition(position);
-                depth===0 ? setChildPositions(raisedPositions) :
+                depth===1 ? setChildPositions(raisedPositions) :
                             setChildPositions(defaultPositions);
                 setChildSize(cubeElementSize);
                 await delay(300);
                 setSuspended(false);
                 setChildOpacity(1);
-                if (depth===0) {
+                if (depth===1) {
                     setChildPositions(defaultPositions);
                     completeTransition();
                 }
@@ -146,7 +125,7 @@ const CubeGroup = props => {
     }, [groupArray])
 
     useEffect(() => {
-        if (!parentSelected) setGroupSelected(false); setPointLightActive(false);
+        if (!parentSelected) setGroupSelected(false);
     }, [parentSelected]);
 
 
@@ -169,10 +148,8 @@ const CubeGroup = props => {
             await delay (500);
             setChildPositions(trueFieldPositions);
             setChildSize(fieldElementSize);
-            setPointLightActive(true);
             setGroupSelected(true);
         } else {
-            setPointLightActive(false);
             setGroupSelected(false);
             setChildPositions(raisedPositions);
             setChildSize(cubeElementSize);
@@ -183,18 +160,12 @@ const CubeGroup = props => {
 
     // Animate group-level changes
     const aProps = useSpring({
-        gPosition: groupPosition,
-        pointInt: parentLightActive ? 0.5 : 0
+        gPosition: groupPosition
     });
 
     return (
         <a.mesh position={aProps.gPosition}>
 
-            <a.pointLight 
-                position={aProps.gPosition} 
-                color="white"
-                intensity={aProps.pointInt}
-                distance={size[0]*2}/>
             <ArrayCube
                 element={groupArray}
                 position={position}
@@ -225,7 +196,6 @@ const CubeGroup = props => {
                         opacity={childOpacity}
 
                         parentSelected={groupSelected}
-                        parentLightActive={pointLightActive}
                         parentOverridden={isOverridden}
                         parentFieldDim={newFieldDim}
                         parentFieldOffset={newFieldOffset}
