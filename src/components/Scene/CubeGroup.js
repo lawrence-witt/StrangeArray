@@ -15,15 +15,14 @@ import { usePrevious } from '../../utils/CustomHooks';
 import ArrayCube from './ArrayCube';
 import PrimCube from './PrimCube';
 import { expandStack, collapseStack, refocusStack } from '../../redux/actions/stackActions';
-import { persistTransition, completeTransition } from '../../redux/actions/viewActions';
 
 const CubeGroup = props => {
     // Parent Props
     const { groupArray, index, path, depth, currentFieldPaths, position, size, opacity, parentSelected, parentOverridden, parentFieldDim, parentFieldOffset, parentFocus, font } = props;
     // Redux Props
-    const { prevTransitionActive, transitionActive, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeFieldElements, topFieldLayer, activeRoots, deletionActive, swapActive, controlsActive, topRoot } = props;
+    const { transitionActive, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeFieldElements, topFieldLayer, activeRoots, deletionActive, swapActive, controlsActive, topRoot } = props;
     // Redux Actions
-    const { expandStack, collapseStack, refocusStack, persistTransition, completeTransition } = props;
+    const { expandStack, collapseStack, refocusStack } = props;
 
     // Position/Size Config
     const newFieldDim = Math.ceil(Math.sqrt(groupArray.length)) > parentFieldDim ? Math.ceil(Math.sqrt(groupArray.length)) : parentFieldDim;
@@ -41,39 +40,17 @@ const CubeGroup = props => {
 
     const nextFieldPaths = groupArray.map((e, i) => [...path, i.toString()]);
     const nextFocus = parentFocus+(size[1]/2)+(fieldElementSize[1]/2)+layerPadPerc;
-    const [groupSelected, setGroupSelected] = useState(false);
-    const [suspended, setSuspended] = useState(false);
 
-    const prevPosition = usePrevious(position);
+    const [groupSelected, setGroupSelected] = useState(false);
     const [groupPosition, setGroupPosition] = useState(() => {
         return swapActive || deletionActive ? [position[0], position[1]+size[1]/2, position[2]] : position;
     });
     const [childPositions, setChildPositions] = useState(defaultPositions);
-
-    const prevSize = usePrevious(size);
     const [childSize, setChildSize] = useState(cubeElementSize);
-    const [childOpacity, setChildOpacity] = useState(1);
-
-
-    /* RESPOND TO REDUX CHANGES*/
-    // Transition out the current user or demo array
-    useEffect(() => {
-        if(!prevTransitionActive && transitionActive) {
-            async function staggerTransitionOut() {
-                setGroupSelected(false);
-                setChildPositions(raisedPositions);
-                setChildOpacity(0);
-                await delay(500);
-                setSuspended(true);
-                if (depth===1) persistTransition();
-            }
-            staggerTransitionOut();
-        }
-    }, [transitionActive]);
 
 
     /* RESPOND TO PARENT COMPONENT CHANGES */
-    // Persist new position/size when config dependencies change
+    // Persist new position/size when config changes
     useEffect(() => {
         setGroupPosition(position);
         if(!controlsActive){
@@ -93,27 +70,9 @@ const CubeGroup = props => {
         }
     }, [...position, ...size, layerPadPerc]);
     
+    // Update the positions when a new element is added or removed
     useEffect(() => {
-        // Transition in the new user or demo array
-        if(prevTransitionActive && !transitionActive) {
-            async function staggerTransitionIn () {
-                setGroupPosition(position);
-                depth===1 ? setChildPositions(raisedPositions) :
-                            setChildPositions(defaultPositions);
-                setChildSize(cubeElementSize);
-                await delay(300);
-                setSuspended(false);
-                setChildOpacity(1);
-                if (depth===1) {
-                    setChildPositions(defaultPositions);
-                    completeTransition();
-                }
-            }
-            staggerTransitionIn();
-        };
-
-        // Update the positions when a new element is added or removed
-        if(!prevTransitionActive && !transitionActive) {
+        if(!transitionActive) {
             if(groupSelected) {
                 setChildPositions(trueFieldPositions);
                 setChildSize(fieldElementSize);
@@ -142,8 +101,8 @@ const CubeGroup = props => {
         };
     };
 
-    const changePositions = async (upwards) => {
-        if(upwards) {
+    const changePositions = async (expand) => {
+        if(expand) {
             setChildPositions(raisedPositions);
             await delay (500);
             setChildPositions(trueFieldPositions);
@@ -183,7 +142,7 @@ const CubeGroup = props => {
                 inActiveRoots={inActiveRoots}
                 font={font}/>
 
-            {suspended ? null : groupArray.map((lowerElement, i) => {
+            {groupArray.map((lowerElement, i) => {
                 return !childPositions[i] ? null : Array.isArray(lowerElement) ? (
                     <ConnectedCubeGroup 
                         groupArray={lowerElement}
@@ -193,7 +152,7 @@ const CubeGroup = props => {
                         currentFieldPaths={nextFieldPaths}
                         position={childPositions[i].map(vec => vec/2)}
                         size={childSize}
-                        opacity={childOpacity}
+                        opacity={opacity}
 
                         parentSelected={groupSelected}
                         parentOverridden={isOverridden}
@@ -209,7 +168,7 @@ const CubeGroup = props => {
                         path={nextFieldPaths[i]}
                         position={childPositions[i]}
                         size={childSize}
-                        opacity={childOpacity}
+                        opacity={opacity}
 
                         groupSelected={groupSelected}
                         parentOverridden={isOverridden}
@@ -222,7 +181,6 @@ const CubeGroup = props => {
 }
 
 const mapStateToProps = state => ({
-    prevTransitionActive: state.view.prevTransitionActive,
     transitionActive: state.view.transitionActive,
     deletionActive: state.view.deletionActive,
     swapActive: state.view.swapActive,
@@ -256,7 +214,7 @@ CubeGroup.propTypes = {
 };
 
 const ConnectedCubeGroup = connect(mapStateToProps, {
-    expandStack, collapseStack, refocusStack, persistTransition, completeTransition
+    expandStack, collapseStack, refocusStack
 })(CubeGroup);
 
 export default ConnectedCubeGroup;

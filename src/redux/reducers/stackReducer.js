@@ -8,13 +8,14 @@ import {
     COLLAPSE_STACK, 
     ADD_TO_STACK, 
     REMOVE_FROM_STACK, 
-    CLEAR_STACK, 
+    CLEAR_STACK,
+    INITIALISE_STACK,
     SWAP_STACK} from '../actions/types';
 
 const initialState = {
     demoArray: [[[[[[[{type: 'Boolean', content: true}]]]]]]],
     rawUserArray: '',
-    //userArray: [{type: 'Null', content: null}, [{type: 'Number', content: 6}, {type: 'String', content: "hello"}]],
+    //demoArray: [{type: 'Null', content: null}, [{type: 'Number', content: 6}, {type: 'String', content: "hello"}], {type: 'String', content: "hello"}, {type: 'String', content: "hello"}, {type: 'String', content: "hello"}],
     userArray: [],
     currentPath: [],
     dimensions: 6,
@@ -115,6 +116,12 @@ export default function(state = initialState, action) {
                 topFieldLayer: [],
                 activeRoots: [],
                 topRoot: []
+            }
+        case INITIALISE_STACK:
+            return {
+                ...state,
+                activeFieldElements: action.payload,
+                topFieldLayer: action.payload
             }
             default:
                 return state

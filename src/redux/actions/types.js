@@ -36,3 +36,4 @@ export const REMOVE_FROM_STACK = 'REMOVE_FROM_STACK';
 export const SWAP_STACK = 'SWAP_STACK';
 
 export const CLEAR_STACK = 'CLEAR_STACK';
+export const INITIALISE_STACK = 'INITIALISE_STACK';

@@ -5,7 +5,6 @@ import {
     UNFOCUS_ELEMENTS,
 
     START_TRANSITION, 
-    PERSIST_TRANSITION, 
     COMPLETE_TRANSITION,
     SET_USER_UPLOAD,
 
@@ -20,7 +19,9 @@ import {
 
     TOGGLE_CONTROLS,
 
-    CLEAR_STACK} from './types';
+    // Stack Actions
+    CLEAR_STACK,
+    INITIALISE_STACK} from './types';
     
 
 // Set the pointer to cursor on the canvas container when hovering on cube
@@ -76,23 +77,19 @@ export const startTransition = destination => dispatch => {
         payload: {
             destination
         }
-    })
-}
-
-// Signals that the current stack has transitioned out and view can switch to new stack
-export const persistTransition = () => (dispatch, getState) => {
-    const destination = getState().view.transitionDestination;
-
-    dispatch({
-        type: PERSIST_TRANSITION,
-        payload: {
-            destination
-        }
     });
 }
 
 // Resets all transition state for the next transition
-export const completeTransition = () => dispatch => {
+export const completeTransition = () => (dispatch, getState) => {
+    const userArray = getState().stack.userArray.slice();
+    const destination = getState().view.transitionDestination;
+    const basePaths = destination === 'home' ? [] : userArray.map((e, i) => [i.toString()]);
+
+    dispatch({
+        type: INITIALISE_STACK,
+        payload: basePaths
+    });
 
     dispatch({ 
         type: COMPLETE_TRANSITION 

@@ -1,4 +1,4 @@
-/* Dependencies */
+// Dependencies
 import React, { Suspense, useRef, useState, useEffect, useMemo} from 'react';
 import { Provider, connect } from 'react-redux';
 import delay from 'delay';
@@ -12,11 +12,12 @@ import * as THREE from 'three';
 
 // Imported Sheets
 import store from '../../redux/store';
+import { completeTransition } from '../../redux/actions/viewActions';
+
 import ConnectedCubeGroup from './CubeGroup';
 import PrimCube from './PrimCube';
 import Pedestal from './Pedestal';
-import { getFieldData, compensateFieldPositions } from '../../utils/Calculator';
-import { usePrevious } from '../../utils/CustomHooks';
+import { getFieldData} from '../../utils/Calculator';
 
 extend({ OrbitControls });
 
@@ -98,28 +99,65 @@ const SceneLight = props => {
 
 const Scene = props => {
 
-    const { view, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc} = props;
+    const { view, transitionActive, completeTransition, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc} = props;
 
     const [currentArray, setCurrentArray] = useState(demoArray);
-
-    const pedestalSize = [baseFieldSize, baseFieldSize*2, baseFieldSize];
+    const pedestalSize = [baseFieldSize, baseFieldSize*1.2, baseFieldSize];
     const fieldDim = Math.ceil(Math.sqrt(currentArray.length));
 
-    // Swap out the arrays during view transition
-    useEffect(() => {
-        view === 'edit' ? setCurrentArray(userArray) : 
-                          setCurrentArray(demoArray);
-    }, [view]);
-
-    // Update the active array when its elements change
-    useEffect(() => {
-        if (view === 'edit') setCurrentArray(userArray);
-    }, [userArray])
-
-    // Load Font
-    const font = useLoader(THREE.FontLoader, '../fonts/Consolas_Regular.typeface.json');
-
     const { rawFieldPositions, fieldElementSize } = getFieldData(fieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
+    const transitionedPositions = rawFieldPositions.reduce((a, c) => [...a, [c[0], c[1]+baseFieldSize, c[2]]], []);
+
+    const [stackActive, setStackActive] = useState(true);
+    const [stackPosition, setStackPosition] = useState(rawFieldPositions);
+    const [stackOpacity, setStackOpacity] = useState(1);
+    const [stackSuspended, setStackSuspended] = useState(false);
+    const isMounted = useRef(false);
+
+    // Handle transition between user and demo arrays
+    useEffect(() => {
+        if(isMounted.current) {
+            if(transitionActive) {
+                async function staggerTransitionOut() {
+                    setStackActive(false);
+                    setStackPosition(transitionedPositions);
+                    setStackOpacity(0);
+                    await delay(400);
+                    setStackSuspended(true);
+                    view === 'home' ? setCurrentArray(userArray) : 
+                                      setCurrentArray(demoArray);
+                    completeTransition();
+                }
+                staggerTransitionOut();
+            } else {
+                async function staggerTransitionIn() {
+                    setStackPosition(transitionedPositions);
+                    await delay(400);
+                    setStackActive(true);
+                    setStackSuspended(false);
+                    setStackOpacity(1);
+                    setStackPosition(rawFieldPositions);
+                }
+                staggerTransitionIn();
+            }
+        } else {
+            isMounted.current = true;
+        }
+    }, [transitionActive]);
+
+    // Update the stack when array elements change
+    useEffect(() => {
+        if (view === 'edit'){
+            setCurrentArray(userArray);
+        }
+    }, [userArray]);
+
+    useEffect(() => {
+        setStackPosition(rawFieldPositions);
+    }, [currentArray]);
+
+    // Load Index Marker Font
+    const font = useLoader(THREE.FontLoader, '../fonts/Consolas_Regular.typeface.json');
 
     return (
         <div className={`canvas-container ${hoverActive ? 'hovered' : ''}`}>
@@ -132,19 +170,19 @@ const Scene = props => {
             <SceneLight focusPosition={focusPosition} baseFieldSize={baseFieldSize}/>
             <Pedestal pedestalSize={pedestalSize} fieldElementSize={fieldElementSize} masterBasePosition={masterBasePosition}/>
             <Provider store={store}>
-            {currentArray.map((lowerElement, i) => {
-                return Array.isArray(lowerElement) ? (
+            {stackSuspended ? null : currentArray.map((lowerElement, i) => {
+                return !stackPosition[i] ? null : Array.isArray(lowerElement) ? (
                     <ConnectedCubeGroup 
                         groupArray={lowerElement}
                         index={i}
                         path={[i.toString()]}
                         depth={1}
                         currentFieldPaths={currentArray.map((e, i) => [i.toString()])}
-                        position={rawFieldPositions[i].map(vec => vec/2)}
+                        position={stackPosition[i].map(vec => vec/2)}
                         size={fieldElementSize}
-                        opacity={1}
+                        opacity={stackOpacity}
 
-                        parentSelected={true}
+                        parentSelected={stackActive}
                         parentOverridden={false}
                         parentFieldDim={fieldDim}
                         parentFieldOffset={masterBasePosition}
@@ -156,9 +194,9 @@ const Scene = props => {
                         element={lowerElement}
                         index={i}
                         path={[i.toString()]}
-                        position={rawFieldPositions[i]}
+                        position={stackPosition[i]}
                         size={fieldElementSize}
-                        opacity={1}
+                        opacity={stackOpacity}
 
                         groupSelected={true}
                         parentOverridden={false}
@@ -174,6 +212,7 @@ const Scene = props => {
 
 const mapStateToProps = state => ({
     view: state.view.view,
+    transitionActive: state.view.transitionActive,
     hoverActive: state.view.hoverActive,
 
     demoArray: state.stack.demoArray,
@@ -188,6 +227,7 @@ const mapStateToProps = state => ({
 
 Scene.propTypes = {
     view: PropTypes.string,
+    transitionActive: PropTypes.bool,
     hoverActive: PropTypes.bool,
 
     demoArray: PropTypes.array,
@@ -200,4 +240,4 @@ Scene.propTypes = {
     layerPadPerc: PropTypes.number
 }
 
-export default connect(mapStateToProps)(Scene);
+export default connect(mapStateToProps, { completeTransition })(Scene);

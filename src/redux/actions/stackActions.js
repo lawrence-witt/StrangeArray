@@ -1,8 +1,4 @@
-import {
-    SET_USER_UPLOAD,
-    PREP_FOR_DELETION,
-    TOGGLE_DOWNLOAD,
-    
+import {    
     UPDATE_UNIT_PADDING,
     UPDATE_LAYER_PADDING,
     REFOCUS_STACK,
@@ -12,7 +8,12 @@ import {
     COLLAPSE_STACK, 
     ADD_TO_STACK, 
     REMOVE_FROM_STACK,
-    SWAP_STACK } from './types';
+    SWAP_STACK,
+
+    //View Actions
+    SET_USER_UPLOAD,
+    PREP_FOR_DELETION,
+    TOGGLE_DOWNLOAD} from './types';
 
 
 export const updateUnitPadding = newValue => dispatch => {

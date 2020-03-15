@@ -5,7 +5,6 @@ import {
     UNFOCUS_ELEMENTS,
 
     START_TRANSITION, 
-    PERSIST_TRANSITION, 
     COMPLETE_TRANSITION,
     SET_USER_UPLOAD,
 
@@ -22,7 +21,6 @@ import {
 
 const initialState = {
     view: 'home',
-    prevTransitionActive: false,
     transitionActive: false,
     transitionDestination: '',
     userUpload: false,
@@ -66,21 +64,14 @@ export default function(state = initialState, action) {
         case START_TRANSITION:
             return {
                 ...state,
-                prevTransitionActive: false,
                 transitionActive: true,
                 transitionDestination: action.payload.destination
-            }
-        case PERSIST_TRANSITION:
-            return {
-                ...state,
-                view: action.payload.destination,
-                prevTransitionActive: true,
-                transitionActive: false
             }
         case COMPLETE_TRANSITION:
             return {
                 ...state,
-                prevTransitionActive: false,
+                view: state.transitionDestination,
+                transitionActive: false,
                 transitionDestination: ''
             }
         case SET_USER_UPLOAD:
