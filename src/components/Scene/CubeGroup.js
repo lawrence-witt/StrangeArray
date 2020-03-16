@@ -5,13 +5,10 @@ import delay from 'delay';
 import PropTypes from 'prop-types';
 
 // Three Dependencies
-import { Canvas, useFrame, useThree, extend, useLoader} from 'react-three-fiber';
 import { useSpring, a } from 'react-spring/three';
-import * as THREE from 'three';
 
 // Imported Sheets
 import { getCubeData, getFieldData, compensateFieldPositions } from '../../utils/Calculator';
-import { usePrevious } from '../../utils/CustomHooks';
 import ArrayCube from './ArrayCube';
 import PrimCube from './PrimCube';
 import { expandStack, collapseStack, refocusStack } from '../../redux/actions/stackActions';
@@ -20,7 +17,7 @@ const CubeGroup = props => {
     // Parent Props
     const { groupArray, index, path, depth, currentFieldPaths, position, size, opacity, parentSelected, parentOverridden, parentFieldDim, parentFieldOffset, parentFocus, font } = props;
     // Redux Props
-    const { transitionActive, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeFieldElements, topFieldLayer, activeRoots, deletionActive, swapActive, controlsActive, topRoot } = props;
+    const { transitionActive, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeFieldElements, topFieldLayer, activeRoots, topRoot, editorState } = props;
     // Redux Actions
     const { expandStack, collapseStack, refocusStack } = props;
 
@@ -43,7 +40,7 @@ const CubeGroup = props => {
 
     const [groupSelected, setGroupSelected] = useState(false);
     const [groupPosition, setGroupPosition] = useState(() => {
-        return swapActive || deletionActive ? [position[0], position[1]+size[1]/2, position[2]] : position;
+        return editorState.swap || editorState.delete ? [position[0], position[1]+size[1]/2, position[2]] : position;
     });
     const [childPositions, setChildPositions] = useState(defaultPositions);
     const [childSize, setChildSize] = useState(cubeElementSize);
@@ -53,7 +50,7 @@ const CubeGroup = props => {
     // Persist new position/size when config changes
     useEffect(() => {
         setGroupPosition(position);
-        if(!controlsActive){
+        if(!editorState.controls){
             setChildPositions(defaultPositions);
             setChildSize(cubeElementSize);
         } else {
@@ -185,6 +182,7 @@ const mapStateToProps = state => ({
     deletionActive: state.view.deletionActive,
     swapActive: state.view.swapActive,
     controlsActive: state.view.controlsActive,
+    editorState: state.view.editorState,
 
     masterBasePosition: state.stack.masterBasePosition,
     baseFieldSize: state.stack.baseFieldSize,

@@ -4,11 +4,11 @@ import { a, useSpring } from 'react-spring';
 
 import './FocusModal.css';
 import { usePrevious } from '../../../utils/CustomHooks';
-import { focusElement } from '../../../redux/actions/viewActions';
+import { focusElement, unfocusElements } from '../../../redux/actions/viewActions';
 
 const FocusModal = props => {
     const { opened } = props;
-    const { focussedElement, focusElement } = props;
+    const { focussedElement, unfocusElements } = props;
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
     const [modalActive, setModalActive] = useState(false);
@@ -27,7 +27,7 @@ const FocusModal = props => {
         transform: modalEntering ? 'translateY(0%)' : 'translateY(-100%)',
         onRest: () => {if(!modalEntering && prevEntering) {
             setModalActive(false);
-            focusElement(null, null, true);
+            unfocusElements();
         }}
     });
 
@@ -43,4 +43,4 @@ const mapStateToProps = state => ({
     focussedElement: state.view.focussedElement
 });
 
-export default connect(mapStateToProps, { focusElement })(FocusModal);
+export default connect(mapStateToProps, { focusElement, unfocusElements })(FocusModal);

@@ -102,7 +102,7 @@ const Scene = props => {
     const { view, transitionActive, completeTransition, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc} = props;
 
     const [currentArray, setCurrentArray] = useState(demoArray);
-    const pedestalSize = [baseFieldSize, baseFieldSize*1.2, baseFieldSize];
+    const pedestalSize = [baseFieldSize, baseFieldSize*1.5, baseFieldSize];
     const fieldDim = Math.ceil(Math.sqrt(currentArray.length));
 
     const { rawFieldPositions, fieldElementSize } = getFieldData(fieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
@@ -110,9 +110,18 @@ const Scene = props => {
 
     const [stackActive, setStackActive] = useState(true);
     const [stackPosition, setStackPosition] = useState(rawFieldPositions);
-    const [stackOpacity, setStackOpacity] = useState(1);
+    const [stackOpacity, setStackOpacity] = useState(0);
     const [stackSuspended, setStackSuspended] = useState(false);
     const isMounted = useRef(false);
+
+    // Fade the stack in on mount
+    useEffect(() => {
+        async function fader() {
+            await delay(700);
+            setStackOpacity(1);
+        }
+        fader();
+    }, [])
 
     // Handle transition between user and demo arrays
     useEffect(() => {

@@ -1,23 +1,19 @@
 import {
     SET_HOVER,
+    SET_EDITOR_STATE,
 
-    FOCUS_ELEMENT, 
-    UNFOCUS_ELEMENTS,
-
+    SET_USER_UPLOAD,
     START_TRANSITION, 
     COMPLETE_TRANSITION,
-    SET_USER_UPLOAD,
 
-    TOGGLE_DELETION, 
+    FOCUS_ELEMENT,
+    UNFOCUS_ELEMENTS,
+
     PREP_FOR_DELETION,
+    RESET_DELETION,
 
-    TOGGLE_SWAP,
     PREP_FOR_SWAP,
-    RESET_SWAP,
-
-    TOGGLE_DOWNLOAD,
-
-    TOGGLE_CONTROLS} from '../actions/types';
+    RESET_SWAP} from '../actions/types';
 
 const initialState = {
     view: 'home',
@@ -27,31 +23,48 @@ const initialState = {
 
     hoverActive: false,
 
-    focusActive: false,
-    focussedElement: {
-        element: null, 
-        path: null
+    editorState: {
+        add: false,
+        delete: false,
+        swap: false,
+        download: false,
+        controls: false,
+        focus: false
     },
 
-    deletionActive: false,
-    pendingDeletion: null,
+    focussedElement: {
+        element: {
+            type: '',
+            content: ''
+        }, 
+        path: []
+    },
 
-    swapActive: false,
+    pendingDeletion: {
+        element: {
+            type: '',
+            content: ''
+        },
+        path: []
+    },
+
     pendingSwap: {
         0: {
-            element: null,
+            element: {
+                type: '',
+                content: ''
+            },
             path: [],
         },
         1: {
-            element: null,
+            element: {
+                type: '',
+                content: ''
+            },
             path: []
         },
         stage: 0
-    },
-
-    downloadActive: false,
-
-    controlsActive: false
+    }
 };
 
 export default function(state = initialState, action) {
@@ -60,6 +73,16 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 hoverActive: action.payload
+            }
+        case SET_EDITOR_STATE:
+            return {
+                ...state,
+                editorState: action.payload
+            }
+        case SET_USER_UPLOAD:
+            return {
+                ...state,
+                userUpload: action.payload
             }
         case START_TRANSITION:
             return {
@@ -74,36 +97,36 @@ export default function(state = initialState, action) {
                 transitionActive: false,
                 transitionDestination: ''
             }
-        case SET_USER_UPLOAD:
-            return {
-                ...state,
-                userUpload: action.payload
-            }
         case FOCUS_ELEMENT:
             return {
                 ...state,
-                focusActive: action.payload.activity,
-                focussedElement: { element: action.payload.element, path: action.payload.path }
+                editorState: {
+                    ...initialState.editorState,
+                    focus: true
+                },
+                focussedElement: { 
+                    element: action.payload.element, 
+                    path: action.payload.path 
+                }
             }
         case UNFOCUS_ELEMENTS:
             return {
                 ...state,
-                focusActive: false
-            }
-        case TOGGLE_DELETION:
-            return {
-                ...state,
-                deletionActive: action.payload
+                editorState: {
+                    ...state.editorState,
+                    focus: false
+                },
+                focussedElement: initialState.focussedElement
             }
         case PREP_FOR_DELETION:
             return {
                 ...state,
                 pendingDeletion: action.payload
             }
-        case TOGGLE_SWAP:
+        case RESET_DELETION:
             return {
                 ...state,
-                swapActive: action.payload
+                pendingDeletion: initialState.pendingDeletion
             }
         case PREP_FOR_SWAP:
             return {
@@ -114,16 +137,6 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 pendingSwap: initialState.pendingSwap
-            }
-        case TOGGLE_DOWNLOAD:
-            return {
-                ...state,
-                downloadActive: action.payload
-            }
-        case TOGGLE_CONTROLS:
-            return {
-                ...state,
-                controlsActive: action.payload
             }
         default:
             return state;

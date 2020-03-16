@@ -12,8 +12,7 @@ import {
 
     //View Actions
     SET_USER_UPLOAD,
-    PREP_FOR_DELETION,
-    TOGGLE_DOWNLOAD} from './types';
+    RESET_DELETION} from './types';
 
 
 export const updateUnitPadding = newValue => dispatch => {
@@ -30,12 +29,7 @@ export const updateLayerPadding = newValue => dispatch => {
     })
 }
 
-export const refocusStack = newFocus => (dispatch, getState) => {
-    const currentFocus = getState().stack.focusPosition;
-
-    // This is a temporary fix: the Calculator functions should be reworked during testing
-    newFocus = !newFocus ? [0, 0, 0] : [currentFocus[0], newFocus, currentFocus[2]];
-
+export const refocusStack = newFocus => dispatch => {
     dispatch({
         type: REFOCUS_STACK,
         payload: newFocus
@@ -113,11 +107,6 @@ export const setRawUserArray = () => (dispatch, getState) => {
         type: SET_RAW_USER_ARRAY,
         payload: unformattedArray
     });
-
-    dispatch({
-        type: TOGGLE_DOWNLOAD,
-        payload: true
-    })
 }
 
 export const expandStack = (newRoot, newFieldElements, newFocus) => (dispatch, getState) => {
@@ -234,8 +223,7 @@ export const removeFromStack = () => (dispatch, getState) => {
     });
 
     dispatch({
-        type: PREP_FOR_DELETION,
-        payload: null
+        type: RESET_DELETION
     });
 }
 

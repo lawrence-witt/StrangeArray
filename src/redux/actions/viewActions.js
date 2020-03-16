@@ -1,23 +1,19 @@
 import {
     SET_HOVER,
+    SET_EDITOR_STATE,
+
+    SET_USER_UPLOAD,
+    START_TRANSITION, 
+    COMPLETE_TRANSITION,
 
     FOCUS_ELEMENT,
     UNFOCUS_ELEMENTS,
 
-    START_TRANSITION, 
-    COMPLETE_TRANSITION,
-    SET_USER_UPLOAD,
-
-    TOGGLE_DELETION,
     PREP_FOR_DELETION,
+    RESET_DELETION,
 
-    TOGGLE_SWAP,
     PREP_FOR_SWAP,
     RESET_SWAP,
-
-    TOGGLE_DOWNLOAD,
-
-    TOGGLE_CONTROLS,
 
     // Stack Actions
     CLEAR_STACK,
@@ -33,36 +29,30 @@ export const setHover = bool => dispatch => {
     })
 }
 
-// Place a new focussed element in the store, or reset it
-export const focusElement = (element, path, reset=false) => dispatch => {
-    
-    if(reset) {
-        dispatch({
-            type: FOCUS_ELEMENT,
-            payload: {
-                element: null,
-                path: null,
-                activity: false
-            }
-        })
-    } else {
-        dispatch({
-            type: FOCUS_ELEMENT,
-            payload: {
-                element,
-                path,
-                activity: true
-            }
-        });
-    };
+export const setEditorState = mode => (dispatch, getState) => {
+    // Possily rework all this use to use initial state in the reducer instead?
+    const editorState = getState().view.editorState;
+
+    const newEditState = Object.keys(editorState).reduce((obj, key) => {
+        key === mode ? 
+            obj[key] = !editorState[key] :
+            obj[key] = false;
+        return obj;
+    }, {});
+
+    dispatch({
+        type: SET_EDITOR_STATE,
+        payload: newEditState
+    })
 }
 
-// Signal to the Focus Modal that it needs to close
-export const unfocusElements = () => dispatch => {
+// Notifies the home/edit overlays when user submits custom array
+export const setUserUpload = bool => dispatch => {
 
-    dispatch({ 
-        type: UNFOCUS_ELEMENTS 
-    });
+    dispatch({
+        type: SET_USER_UPLOAD,
+        payload: bool
+    })
 }
 
 // Reset all information about stack placement in the store and signal current stack to transition out
@@ -96,33 +86,31 @@ export const completeTransition = () => (dispatch, getState) => {
     });
 }
 
-// Notifies the home/edit overlays when user submits custom array
-export const setUserUpload = bool => dispatch => {
+// Place a new focussed element in the store, or reset it
+export const focusElement = (element, path) => (dispatch, getState) => {
+    
 
     dispatch({
-        type: SET_USER_UPLOAD,
-        payload: bool
-    })
-}
-
-// Toggle the deletion mode which changes cube click behaviour
-export const toggleDeletion = bool => dispatch => {
-
-    dispatch({ 
-        type: TOGGLE_DELETION, 
-        payload: bool 
+        type: FOCUS_ELEMENT,
+        payload: {
+            element,
+            path
+        }
     });
 }
 
-// Single out an element for deletion confirmation when it is clicked on in deletion mode, reset the stored value when modal closes
-export const prepForDeletion = (element, path, reset=false) => dispatch => {
+export const unfocusElements = () => dispatch => {
 
-    if(reset) {
-        dispatch({
-            type: PREP_FOR_DELETION,
-            payload: null
-        })
-    } else {
+    dispatch({
+        type: UNFOCUS_ELEMENTS
+    })
+}
+
+
+// Single out an element for deletion confirmation when it is clicked on in deletion mode, reset the stored value when modal closes
+export const prepForDeletion = (element, path, add=true) => dispatch => {
+
+    if(add) {
         dispatch({ 
             type: PREP_FOR_DELETION,
             payload: {
@@ -130,15 +118,24 @@ export const prepForDeletion = (element, path, reset=false) => dispatch => {
                 path
             }
         })
+    } else {
+        dispatch({
+            type: PREP_FOR_DELETION,
+            payload: {
+                element: {
+                    type: '',
+                    content: ''
+                },
+                path: []
+            }
+        })
     }
 }
 
-// Toggle the swap mode which changes cube click behaviour
-export const toggleSwap = bool => dispatch => {
+export const resetDeletion = () => dispatch => {
 
     dispatch({
-        type: TOGGLE_SWAP,
-        payload: bool
+        type: RESET_DELETION
     })
 }
 
@@ -179,20 +176,4 @@ export const resetSwap = () => dispatch => {
     dispatch({
         type: RESET_SWAP
     });
-}
-
-export const toggleDownload = bool => dispatch => {
-
-    dispatch({
-        type: TOGGLE_DOWNLOAD,
-        payload: bool
-    })
-}
-
-export const toggleControls = bool => dispatch => {
-
-    dispatch({
-        type: TOGGLE_CONTROLS,
-        payload: bool
-    })
 }

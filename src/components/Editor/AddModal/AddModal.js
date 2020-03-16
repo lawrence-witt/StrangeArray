@@ -7,11 +7,12 @@ import { usePrevious } from '../../../utils/CustomHooks';
 import { addToStack } from '../../../redux/actions/stackActions';
 import TypeSelector from './TypeSelector/TypeSelector';
 import InputSelector from './InputSelector/InputSelector';
+import { setEditorState } from '../../../redux/actions/viewActions';
 
 /* global BigInt */
 
 const AddModal = props => {
-    const { opened, addHandler } = props;
+    const { opened, setEditorState } = props;
     const { addToStack } = props;
 
     /* INTERNAL STATE */
@@ -105,7 +106,7 @@ const AddModal = props => {
         }
 
         if (validated) {
-            addHandler();
+            setEditorState('add');
             addToStack(submitModel);
         }
     }
@@ -126,4 +127,4 @@ const AddModal = props => {
     ) : null;
 }
 
-export default connect(null, { addToStack })(AddModal);
+export default connect(null, { addToStack, setEditorState })(AddModal);

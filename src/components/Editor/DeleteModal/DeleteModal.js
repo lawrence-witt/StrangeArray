@@ -4,13 +4,13 @@ import { a, useSpring } from 'react-spring';
 
 import './DeleteModal.css';
 import { usePrevious } from '../../../utils/CustomHooks';
-import { prepForDeletion } from '../../../redux/actions/viewActions';
+import { resetDeletion } from '../../../redux/actions/viewActions';
 import { removeFromStack } from '../../../redux/actions/stackActions';
 
 const DeleteModal = props => {
 
     const { opened } = props;
-    const { pendingDeletion, prepForDeletion, removeFromStack } = props;
+    const { pendingDeletion, resetDeletion, removeFromStack } = props;
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
     const [modalActive, setModalActive] = useState(false);
@@ -29,7 +29,7 @@ const DeleteModal = props => {
         transform: modalEntering ? 'translateY(0%)' : 'translateY(-100%)',
         onRest: () => {if(!modalEntering && prevEntering) {
             setModalActive(false);
-            prepForDeletion(null, null, true);
+            resetDeletion();
         }}
     });
 
@@ -42,7 +42,7 @@ const DeleteModal = props => {
     return modalActive ? (
         <a.div className="delete-modal" style={modalSpring}>
             <h2>Select An Element To Delete</h2>
-            {pendingDeletion ? (
+            {pendingDeletion.element.type ? (
                 <div className="delete-selection-container">
                     <p className="element-type">{pendingDeletion.element.type}</p>
                     <p className="element-content">{pendingDeletion.element.content}</p>
@@ -57,4 +57,4 @@ const mapStateToProps = state => ({
     pendingDeletion: state.view.pendingDeletion
 });
 
-export default connect(mapStateToProps, { prepForDeletion, removeFromStack })(DeleteModal);
+export default connect(mapStateToProps, { resetDeletion, removeFromStack })(DeleteModal);

@@ -1,23 +1,20 @@
 /* Dependencies */
-import React, { useRef, useMemo, useState, useEffect} from 'react';
+import React, { useMemo, useState, useEffect} from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Canvas, useFrame, useThree, extend, useLoader} from 'react-three-fiber';
 import { useSpring, a } from 'react-spring/three';
-import delay from 'delay';
 import * as THREE from 'three';
 
-import { usePrevious } from '../../utils/CustomHooks';
-import { setHover, prepForDeletion, prepForSwap, focusElement, unfocusElements } from '../../redux/actions/viewActions';
+import { setHover, prepForDeletion, prepForSwap, focusElement, setEditorState } from '../../redux/actions/viewActions';
 import IndexMarker from './IndexMarker';
 
 const PrimCube = props => {
     // Parent props
     const {element, index, position, size, opacity, path, groupSelected, parentOverridden, font} = props;
     // Redux Props
-    const {view, deletionActive, pendingDeletion, hoverActive, focusActive, focussedElement, swapActive, pendingSwap, activeFieldElements, topFieldLayer, controlsActive} = props;
+    const {view, editorState, pendingDeletion, hoverActive, focussedElement, pendingSwap, activeFieldElements, topFieldLayer} = props;
     // Redux Actions
-    const {setHover, focusElement, unfocusElements, prepForDeletion, prepForSwap} = props;
+    const {setHover, focusElement, setEditorState, prepForDeletion, prepForSwap} = props;
 
 
     /* RESPOND TO REDUX CHANGES */
@@ -38,29 +35,29 @@ const PrimCube = props => {
 
     // Unhighlight self when another cube is selected/unselected for focus
     useEffect(() => {
-        if(!focusActive ||
+        if(!editorState.focus ||
             path.join(',') !== focussedElement.path.join(',')) {
             setHighlighted(false);
         }
-    }, [focusActive, focussedElement]);
+    }, [editorState.focus, focussedElement]);
 
     // Unhighlight self when another cube is selected/unselected for deletion
     useEffect(() => {
-        if(!deletionActive || 
+        if(!editorState.delete || 
            !pendingDeletion || 
            path.join(',') !== pendingDeletion.path.join(',')) {
             setHighlighted(false);
         }
-    }, [deletionActive, pendingDeletion]);
+    }, [editorState.delete, pendingDeletion]);
 
     // Unhighlight self when another cube is selected/unselected for swap
     useEffect(() => {
-        if(!swapActive ||
+        if(!editorState.swap ||
             (path.join(',') !== pendingSwap[0].path.join(',') &&
             path.join(',') !== pendingSwap[1].path.join(','))) {
                 setHighlighted(false);
             }
-    }, [swapActive, pendingSwap]);
+    }, [editorState.swap, pendingSwap]);
 
     // Alter the cube position based on changes to highlight state
     useEffect(() => {
@@ -73,7 +70,7 @@ const PrimCube = props => {
     /* RESPOND TO PARENT CHANGES */
     // Initialise cube in highlighted position if it has been swapped in
     const [cubePosition, setCubePosition] = useState(() => {
-            return swapActive || deletionActive ? [position[0], position[1]+size[1]/2, position[2]] : position;
+            return editorState.swap || editorState.delete ? [position[0], position[1]+size[1]/2, position[2]] : position;
     });
     const [cubeSize, setCubeSize] = useState(size);
     const cubeColor = useMemo(() => {
@@ -103,8 +100,8 @@ const PrimCube = props => {
 
     /* RESPOND TO MOUSE EVENTS */
     const primClickHandler = e => {
-        if(controlsActive) return;
-        if(deletionActive) {
+        if(editorState.controls) return;
+        if(editorState.delete) {
 
             if(inTopField && !highlighted) {
                 e.stopPropagation();
@@ -113,12 +110,12 @@ const PrimCube = props => {
             } else if(inTopField && highlighted) {
                 e.stopPropagation();
                 setHighlighted(false);
-                prepForDeletion(null, null, true);
+                prepForDeletion(null, null, false);
             } else if(displayState === 'overridden') {
                 e.stopPropagation();
             }
 
-        } else if(swapActive){
+        } else if(editorState.swap){
 
             if(inTopField && !highlighted) {
                 e.stopPropagation();
@@ -140,15 +137,14 @@ const PrimCube = props => {
 
             e.stopPropagation();
             setHighlighted(false);
-            unfocusElements();
-
+            setEditorState(null);
         }
     }
 
     const hoverHandler = (e, entering) => {
         if(displayState === 'topLayer') {
             e.stopPropagation();
-            if(entering && !hoverActive && !controlsActive) {
+            if(entering && !hoverActive && !editorState.controls) {
                 setHover(true);
             } else if (!entering) {
                 setHover(false);
@@ -183,14 +179,11 @@ const PrimCube = props => {
 
 const mapStateToProps = state => ({
     view: state.view.view,
+    editorState: state.view.editorState,
     hoverActive: state.view.hoverActive,
-    focusActive: state.view.focusActive,
     focussedElement: state.view.focussedElement,
-    deletionActive: state.view.deletionActive,
     pendingDeletion: state.view.pendingDeletion,
-    swapActive: state.view.swapActive,
     pendingSwap: state.view.pendingSwap,
-    controlsActive: state.view.controlsActive,
 
     activeFieldElements: state.stack.activeFieldElements,
     topFieldLayer: state.stack.topFieldLayer
@@ -198,12 +191,16 @@ const mapStateToProps = state => ({
 
 PrimCube.propTypes = {
     view: PropTypes.string,
+    editorState: PropTypes.object,
     hoverActive: PropTypes.bool,
     focussedElement: PropTypes.object,
-    deletionActive: PropTypes.bool,
+    pendingDeletion: PropTypes.object,
+    pendingSwap: PropTypes.object,
 
     activeFieldElements: PropTypes.array,
     topFieldLayer: PropTypes.array
 };
 
-export default connect(mapStateToProps, { prepForDeletion, setHover, focusElement, unfocusElements, prepForSwap })(PrimCube);
+export default connect(mapStateToProps, { 
+    prepForDeletion, setHover, focusElement, prepForSwap, setEditorState 
+})(PrimCube);
