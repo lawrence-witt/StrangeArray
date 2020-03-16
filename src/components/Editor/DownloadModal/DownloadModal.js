@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import './DownloadModal.css';
-import { usePrevious } from '../../../utils/CustomHooks';
+import { useModal } from '../../../utils/CustomHooks';
 
 const DownloadModal = props => {
     const { opened } = props;
@@ -11,24 +11,7 @@ const DownloadModal = props => {
     const outputRef = useRef();
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, setModalActive] = useState(false);
-    const [modalEntering, setModalEntering] = useState(false);
-    const prevEntering = usePrevious(modalEntering);
-
-    useEffect(() => {
-        opened ? setModalEntering(true) : setModalEntering(false);
-    }, [opened]);
-
-    useEffect(() => {
-        if(modalEntering) setModalActive(true);
-    }, [modalEntering])
-
-    const modalSpring = useSpring({
-        transform: modalEntering ? 'translateY(0%)' : 'translateY(-100%)',
-        onRest: () => {if(!modalEntering && prevEntering) {
-            setModalActive(false);
-        }}
-    });
+    const [modalActive, modalSpring] = useModal(opened, []);
 
     /* COPY */
     const copyToClipboard = () => {

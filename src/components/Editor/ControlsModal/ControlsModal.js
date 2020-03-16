@@ -4,41 +4,14 @@ import { a, useSpring } from 'react-spring';
 
 import './ControlsModal.css';
 import { updateUnitPadding, updateLayerPadding } from '../../../redux/actions/stackActions';
-import { usePrevious } from '../../../utils/CustomHooks';
+import { useModal } from '../../../utils/CustomHooks';
 
 const ControlsModal = props => {
     const { opened } = props;
     const { unitPadPerc, layerPadPerc, updateUnitPadding, updateLayerPadding } = props;
 
-    // Set default values on mount
-    const mountPadding = useMemo(() => {
-        return {
-            unit: unitPadPerc,
-            layer: layerPadPerc
-        }
-    }, [])
-
-
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, setModalActive] = useState(false);
-    const [modalEntering, setModalEntering] = useState(false);
-    const prevEntering = usePrevious(modalEntering);
-
-    useEffect(() => {
-        opened ? setModalEntering(true) : setModalEntering(false);
-    }, [opened]);
-
-    useEffect(() => {
-        if(modalEntering) setModalActive(true);
-    }, [modalEntering])
-
-    const modalSpring = useSpring({
-        transform: modalEntering ? 'translateY(0%)' : 'translateY(-100%)',
-        onRest: () => {if(!modalEntering && prevEntering) {
-            setModalActive(false);
-        }}
-    });
-
+    const [modalActive, modalSpring] = useModal(opened, []);
 
     /* SLIDERS */
     const handleSlider = e => {

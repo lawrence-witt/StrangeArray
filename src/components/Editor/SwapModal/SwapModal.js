@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import './SwapModal.css';
-import { usePrevious } from '../../../utils/CustomHooks';
+import { useModal } from '../../../utils/CustomHooks';
 import { resetSwap } from '../../../redux/actions/viewActions';
 import { swapStack } from '../../../redux/actions/stackActions';
 
@@ -11,32 +11,12 @@ const SwapModal = props => {
     const { opened } = props;
     const { pendingSwap, resetSwap, swapStack } = props;
 
-
-
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, setModalActive] = useState(false);
-    const [modalEntering, setModalEntering] = useState(false);
-    const prevEntering = usePrevious(modalEntering);
-
-    useEffect(() => {
-        opened ? setModalEntering(true) : setModalEntering(false);
-    }, [opened]);
-
-    useEffect(() => {
-        if(modalEntering) setModalActive(true);
-    }, [modalEntering])
-
-    const modalSpring = useSpring({
-        transform: modalEntering ? 'translateY(0%)' : 'translateY(-100%)',
-        onRest: () => {if(!modalEntering && prevEntering) {
-            setModalActive(false);
-            resetSwap();
-        }}
-    });
+    const [modalActive, modalSpring] = useModal(opened, [resetSwap]);
 
     /* SUBMIT SWAP */
     function handleSwap() {
-        if(pendingSwap[0].element && pendingSwap[1].element) {
+        if(pendingSwap[0].element.type && pendingSwap[1].element.type) {
             swapStack();
             resetSwap();
         }
@@ -47,24 +27,25 @@ const SwapModal = props => {
             <h2 className="swap-title">Select Two Elements To Swap</h2>
 
             <div className="swap-selection-container">
-                <div className="swap-selection one">
-                    <p>{pendingSwap[0].element ? pendingSwap[0].element.type : ''}</p>
-                    <p>{pendingSwap[0].element && pendingSwap[0].element.type === 'Array' ? 
-                        pendingSwap[0].path :
-                        pendingSwap[0].element ? 
-                        pendingSwap[0].element.content : ''}</p>
-                </div>
-                <div className="swap-selection two">
-                    <p>{pendingSwap[1].element ? pendingSwap[1].element.type : ''}</p>
-                    <p>{pendingSwap[1].element && pendingSwap[1].element.type === 'Array' ? 
-                        pendingSwap[1].path :
-                        pendingSwap[1].element ? 
-                        pendingSwap[1].element.content : ''}</p>
-                </div>
+                {pendingSwap[0].element.type ? (
+                    <div className="swap-selection one">
+                    <p>{pendingSwap[0].element.type}</p>
+                    <p>{pendingSwap[0].element.type === 'Array' ? 
+                        pendingSwap[0].path : pendingSwap[0].element.content}</p>
+                    </div>
+                ) : null}
+                
+                {pendingSwap[1].element.type ? (
+                    <div className="swap-selection two">
+                    <p>{pendingSwap[1].element.type}</p>
+                    <p>{pendingSwap[1].element.type === 'Array' ? 
+                        pendingSwap[1].path : pendingSwap[1].element.content}</p>
+                    </div>
+                ) : null}
             </div>
             
             <div className="swap-button-container">
-                {pendingSwap[0].element && pendingSwap[1].element ? (
+                {pendingSwap[0].element.type && pendingSwap[1].element.type ? (
                     <button className="swap-button" onClick={handleSwap}>
                         Confirm
                     </button>

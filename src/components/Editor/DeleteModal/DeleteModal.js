@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import './DeleteModal.css';
-import { usePrevious } from '../../../utils/CustomHooks';
+import { useModal } from '../../../utils/CustomHooks';
 import { resetDeletion } from '../../../redux/actions/viewActions';
 import { removeFromStack } from '../../../redux/actions/stackActions';
 
@@ -13,26 +13,7 @@ const DeleteModal = props => {
     const { pendingDeletion, resetDeletion, removeFromStack } = props;
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, setModalActive] = useState(false);
-    const [modalEntering, setModalEntering] = useState(false);
-    const prevEntering = usePrevious(modalEntering);
-
-    useEffect(() => {
-        opened ? setModalEntering(true) : setModalEntering(false);
-    }, [opened]);
-
-    useEffect(() => {
-        if(modalEntering) setModalActive(true);
-    }, [modalEntering])
-
-    const modalSpring = useSpring({
-        transform: modalEntering ? 'translateY(0%)' : 'translateY(-100%)',
-        onRest: () => {if(!modalEntering && prevEntering) {
-            setModalActive(false);
-            resetDeletion();
-        }}
-    });
-
+    const [modalActive, modalSpring] = useModal(opened, [resetDeletion]);
 
     /* RESPOND TO CLICK EVENTS */
     const handleDeletion = () => {

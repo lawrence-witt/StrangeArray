@@ -152,16 +152,22 @@ export const prepForSwap = (element, path, add=true) => (dispatch, getState) => 
     } else {
         if(pendingSwap[0].path.join(',') === path.join(',')) {
             pendingSwap[0] = {
-                element: null,
+                element: {
+                    type: '',
+                    content: ''
+                },
                 path: []
             };
             pendingSwap.stage = 0;
         } else if(pendingSwap[1].path.join(',') === path.join(',')) {
             pendingSwap[1] = {
-                element: null,
+                element: {
+                    type: '',
+                    content: ''
+                },
                 path: []
             };
-            pendingSwap.stage = !pendingSwap[0].element ? 0 : 1;
+            pendingSwap.stage = !pendingSwap[0].element.type ? 0 : 1;
         }
     }
 

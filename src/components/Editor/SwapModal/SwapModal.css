@@ -20,12 +20,19 @@
 
 .swap-selection-container {
     flex: 2;
+    display: grid;
+    grid-template-columns: 50% 50%;
     width: 100%;
 }
 
-    .swap-selection {
-        display: inline-block;
-        width: 50%;
+    .swap-selection.one {
+        grid-row: 1 / 2;
+        grid-column: 1 / 2;
+    }
+
+    .swap-selection.two {
+        grid-row: 1 / 2;
+        grid-column: 2 / 3;
     }
 
 .swap-button-container {

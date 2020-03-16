@@ -92,7 +92,7 @@ export const setRawUserArray = () => (dispatch, getState) => {
             } else if (element.type === 'Object') {
                 return JSON.parse(element.content);
             } else if (element.type === 'Number') {
-                return element.content;
+                return Number(element.content);
             } else if (element.type === 'String') {
                 return element.content;
             } else if (element.type === 'Boolean') {
