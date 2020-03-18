@@ -9,13 +9,18 @@ export function usePrevious(value) {
     return ref.current;
 }
 
-export function useModal(opened, cleanup) {
+export function useModal(opened, mountFuncs, unmountFuncs) {
     const [modalActive, setModalActive] = useState(false);
     const [modalEntering, setModalEntering] = useState(false);
     const prevEntering = usePrevious(modalEntering);
 
     useEffect(() => {
-        opened ? setModalEntering(true) : setModalEntering(false);
+        if(opened) {
+            mountFuncs.forEach(func => func());
+            setModalEntering(true);
+        } else {
+            setModalEntering(false);
+        }
     }, [opened]);
 
     useEffect(() => {
@@ -26,7 +31,7 @@ export function useModal(opened, cleanup) {
         transform: modalEntering ? 'translateY(0%)' : 'translateY(-100%)',
         onRest: () => {if(!modalEntering && prevEntering) {
             setModalActive(false);
-            cleanup.forEach(func => func());
+            unmountFuncs.forEach(func => func());
         }}
     });
 

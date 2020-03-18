@@ -8,12 +8,12 @@ import { resetDeletion } from '../../../redux/actions/viewActions';
 import { removeFromStack } from '../../../redux/actions/stackActions';
 
 const DeleteModal = props => {
-
     const { opened } = props;
     const { pendingDeletion, resetDeletion, removeFromStack } = props;
+    const { type, content } = pendingDeletion.element;
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, modalSpring] = useModal(opened, [resetDeletion]);
+    const [modalActive, modalSpring] = useModal(opened, [resetDeletion], [resetDeletion]);
 
     /* RESPOND TO CLICK EVENTS */
     const handleDeletion = () => {
@@ -21,14 +21,19 @@ const DeleteModal = props => {
     }
 
     return modalActive ? (
-        <a.div className="delete-modal" style={modalSpring}>
-            <h2>Select An Element To Delete</h2>
-            {pendingDeletion.element.type ? (
-                <div className="delete-selection-container">
-                    <p className="element-type">{pendingDeletion.element.type}</p>
-                    <p className="element-content">{pendingDeletion.element.content}</p>
-                    <button className="confirm-delete-btn" onClick={handleDeletion}>Confirm</button>
-                </div>
+        <a.div className={`delete-modal ${type}`} style={modalSpring}>
+            <h2 className="delete-title">Select An Element To Delete</h2>
+
+            {type ? (
+            <>
+            <div className="delete-selection-container">
+                <p className="element-type">{type}</p>
+                <p className="element-content">{content}</p>
+            </div>
+            <div className="delete-button-container">
+                <button className="confirm-delete-btn" onClick={handleDeletion}>Confirm</button>
+            </div>
+            </>
             ): null}
         </a.div>
     ) : null;

@@ -29,7 +29,12 @@ export const updateLayerPadding = newValue => dispatch => {
     })
 }
 
-export const refocusStack = newFocus => dispatch => {
+export const refocusStack = newFocus => (dispatch, getState) => {
+    const currentFocus = getState().stack.focusPosition;
+
+    // This is a temporary fix: the Calculator functions should be reworked during testing
+    newFocus = !newFocus ? [0, 0, 0] : [currentFocus[0], newFocus, currentFocus[2]];
+
     dispatch({
         type: REFOCUS_STACK,
         payload: newFocus

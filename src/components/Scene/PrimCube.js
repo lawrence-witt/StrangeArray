@@ -76,18 +76,14 @@ const PrimCube = props => {
     const cubeColor = useMemo(() => {
         switch(element.type) {
             case 'Object':
-                return new THREE.Color('mediumblue');
+                return new THREE.Color('cornflowerblue');
             case 'String':
                 return new THREE.Color('green');
             case 'Boolean':
                 return new THREE.Color('crimson');
             case 'Number':
                 return new THREE.Color('salmon');
-            case 'BigInt':
-                return new THREE.Color('sandybrown');
             case 'Null':
-                return new THREE.Color('dimgray');
-            case 'Undefined':
                 return new THREE.Color('dimgray');
         }
     }, [element]);

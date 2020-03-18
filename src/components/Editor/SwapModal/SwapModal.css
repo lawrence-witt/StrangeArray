@@ -6,12 +6,12 @@
     width: 100%;
     max-width: 400px;
     height: 25%;
-    background-color: grey;
+    color: white;
+    border: 3px solid white;
     z-index: 2;
     overflow-x: hidden;
     overflow-y: auto;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+    box-sizing: border-box;
 }
 
 .swap-title {
@@ -19,10 +19,11 @@
 }
 
 .swap-selection-container {
-    flex: 2;
+    flex: 3;
     display: grid;
     grid-template-columns: 50% 50%;
     width: 100%;
+    overflow-y: auto;
 }
 
     .swap-selection.one {
@@ -33,6 +34,28 @@
     .swap-selection.two {
         grid-row: 1 / 2;
         grid-column: 2 / 3;
+    }
+
+    .swap-selection {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .ss-type {
+        align-self: center;
+        text-align: center;
+        border-bottom: 2px solid white;
+        padding-bottom: 5px;
+        width: 50%;
+    }
+
+    .ss-content {
+        padding: 5px 10px 5px 10px;
+        text-align: center;
+        word-wrap: break-word;
+        text-overflow: ellipsis;
+        overflow-y: auto;
     }
 
 .swap-button-container {

@@ -25,3 +25,27 @@
     padding: 5px;
     cursor: pointer;
 }
+
+.Array {
+    background-color: darkgrey;
+}
+
+.Object {
+    background-color: cornflowerblue;
+}
+
+.String {
+    background-color: green;
+}
+
+.Boolean {
+    background-color: crimson;
+}
+
+.Number {
+    background-color: salmon;
+}
+
+.Null {
+    background-color: dimgray;
+}

@@ -1,12 +1,52 @@
 .delete-modal {
     position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
     max-width: 400px;
     height: 25%;
-    background-color: grey;
     z-index: 2;
     overflow-x: hidden;
     overflow-y: auto;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+    border: 3px solid white;
+    box-sizing: border-box;
+    border-top: unset;
+    transition: background-color 0.5s;
+}
+
+.delete-title {
+    flex: 1;
+    color: white;
+    text-align: center;
+}
+
+.delete-selection-container {
+    flex: 3;
+    color: white;
+    width: 90%;
+    height: auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+    .element-type {
+        border-bottom: 2px solid white;
+        padding-bottom: 5px;
+        text-align: center;
+    }
+
+    .element-content {
+        margin-top: 5px;
+        overflow-y: auto;
+        padding-right: 5px;
+        word-wrap: break-word;
+    }
+
+.delete-button-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

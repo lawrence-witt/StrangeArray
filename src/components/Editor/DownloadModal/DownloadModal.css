@@ -6,12 +6,12 @@
     width: 100%;
     max-width: 400px;
     height: 25%;
-    background-color: grey;
+    border: 3px solid white;
+    border-top: unset;
+    box-sizing: border-box;
     z-index: 1;
     overflow-x: hidden;
     overflow-y: auto;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
 }
 
 .array-container {

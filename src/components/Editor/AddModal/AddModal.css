@@ -3,12 +3,22 @@
     width: 100%;
     max-width: 400px;
     height: 25%;
-    background-color: grey;
     z-index: 1;
+    border: 3px solid white;
+    border-top: unset;
+}
+
+.selection-container {
+    position: absolute;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+}
+
+.selection-container.error {
+    box-shadow: 0px 0.1px 10px;
 }
 
 .type-container {
@@ -19,14 +29,43 @@
     grid-template-columns: 1fr 1fr;
 }
 
+    .type-button:nth-child(1) {
+        border-top: unset;
+        border-left: unset;
+    }
+
+    .type-button:nth-child(2) {
+        border-top: unset;
+        border-right: unset;
+    }
+
+    .type-button:nth-child(3) {
+        border-left: unset;
+    }
+    .type-button:nth-child(4) {
+        border-right: unset;
+    }
+    .type-button:nth-child(5) {
+        border-left: unset;
+        border-bottom: unset;
+    }
+    .type-button:nth-child(6) {
+        border-right: unset;
+        border-bottom: unset;
+    }
+
     .type-button {
-        background-color: grey;
-        border: 1px solid black;
+        border: 2px solid white;
+        color: white;
+        font-weight: 700;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .type-button:hover {
         cursor: pointer;
-        background-color: white;
     }
 
 .input-container {
@@ -36,12 +75,14 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    color: white;
 }
 
     .input-data-container {
         flex: 3;
         display: flex;
         flex-direction: column;
+        align-items: center;
     }
 
         .input-title {
@@ -53,20 +94,61 @@
 
         .warning-container {
             flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80%;
+            font-size: 0.85rem;
+            font-weight: 700;
         }
 
         .input-box {
             flex: 3;
+            font-size: 1rem;
             display: flex;
             justify-content: center;
             align-items: center;
+            width: 80%;
         }
 
             .input-box textarea {
-                width: 80%;
+                box-sizing: border-box;
+                font-size: inherit;
                 min-width: 200px;
+                padding: 5px;
                 height: 100%;
+                width: 100%;
                 resize: none;
+            }
+
+            .number-input {
+                font-size: inherit;
+                height: 20%;
+                width: 80%;
+                padding: 5px;
+            }
+
+            .bool-button {
+                cursor: pointer;
+                font-size: inherit;
+                font-weight: 700;
+                width: 25%;
+                height: 25%;
+                margin: 10%;
+                border: 3px solid white;
+                color: white;
+                border-radius: 10px;
+                background-color: unset;
+                transition: border-color 0.2s, color 0.2s;
+            }
+
+            .bool-button:hover {
+                color: black;
+            }
+
+            .bool-button.selected {
+                border-color: black;
+                color: black;
             }
 
     .input-button-container {

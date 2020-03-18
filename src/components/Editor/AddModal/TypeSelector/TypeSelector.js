@@ -13,22 +13,22 @@ const TypeSelector = props => {
     const typeSpring = useSpring({
         transform: modalStage === 'typeSelector' ? 'translateX(0%)' : 'translateX(-100%)',
         onRest: () => {
-            if(dataModel.element.type && modalStage === 'typeSelector' && prevModalStage === 'inputSelector') {
+            if(dataModel.type && modalStage === 'typeSelector' && prevModalStage === 'inputSelector') {
                 setDataModel(dataSchema);
             }
         }
     });
 
     return (
-        <a.div className="type-container" style={typeSpring}>
+        <a.div className={`type-container`} style={typeSpring}>
             {types.map(type => {
-                return <button className="type-button" key={type}
+                return <span className={`type-button`} key={type}
                         onClick={() => {
-                            setDataModel({...dataModel, element:{
-                                type,
-                                content: null
-                            }});
-                        }}>{type}</button>
+                            setDataModel({...dataModel, type});
+                        }}
+                        onPointerEnter={e => e.target.classList.add(type)}
+                        onPointerLeave={e => e.target.classList.remove(type)}
+                        >{type}</span>
             })}
         </a.div>
     )

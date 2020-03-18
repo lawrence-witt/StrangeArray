@@ -12,7 +12,7 @@ const SwapModal = props => {
     const { pendingSwap, resetSwap, swapStack } = props;
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, modalSpring] = useModal(opened, [resetSwap]);
+    const [modalActive, modalSpring] = useModal(opened, [resetSwap], [resetSwap]);
 
     /* SUBMIT SWAP */
     function handleSwap() {
@@ -29,16 +29,16 @@ const SwapModal = props => {
             <div className="swap-selection-container">
                 {pendingSwap[0].element.type ? (
                     <div className="swap-selection one">
-                    <p>{pendingSwap[0].element.type}</p>
-                    <p>{pendingSwap[0].element.type === 'Array' ? 
+                    <p className="ss-type">{pendingSwap[0].element.type}</p>
+                    <p className="ss-content">{pendingSwap[0].element.type === 'Array' ? 
                         pendingSwap[0].path : pendingSwap[0].element.content}</p>
                     </div>
                 ) : null}
                 
                 {pendingSwap[1].element.type ? (
                     <div className="swap-selection two">
-                    <p>{pendingSwap[1].element.type}</p>
-                    <p>{pendingSwap[1].element.type === 'Array' ? 
+                    <p className="ss-type">{pendingSwap[1].element.type}</p>
+                    <p className="ss-content">{pendingSwap[1].element.type === 'Array' ? 
                         pendingSwap[1].path : pendingSwap[1].element.content}</p>
                     </div>
                 ) : null}

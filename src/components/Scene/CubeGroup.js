@@ -47,7 +47,7 @@ const CubeGroup = props => {
 
 
     /* RESPOND TO PARENT COMPONENT CHANGES */
-    // Persist new position/size when config changes
+    // Persist new positions/size when config changes
     useEffect(() => {
         setGroupPosition(position);
         if(!editorState.controls){
@@ -67,7 +67,7 @@ const CubeGroup = props => {
         }
     }, [...position, ...size, layerPadPerc]);
     
-    // Update the positions when a new element is added or removed
+    // Update the positions/size when a new element is added or removed
     useEffect(() => {
         if(!transitionActive) {
             if(groupSelected) {

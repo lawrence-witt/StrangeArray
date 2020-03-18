@@ -37,7 +37,9 @@ const Editor = props => {
         startTransition('home');
     }
 
-    const buttonSpring = useSpring({transform: editorActive ? 'translateY(0%)' : 'translateY(200%)'});
+    const buttonSpring = useSpring({
+        transform: editorActive ? 'translateY(0%)' : 'translateY(200%)'
+    });
 
     return (
         <div className="editor-container">

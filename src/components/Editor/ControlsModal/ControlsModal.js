@@ -11,7 +11,7 @@ const ControlsModal = props => {
     const { unitPadPerc, layerPadPerc, updateUnitPadding, updateLayerPadding } = props;
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, modalSpring] = useModal(opened, []);
+    const [modalActive, modalSpring] = useModal(opened, [], []);
 
     /* SLIDERS */
     const handleSlider = e => {
@@ -26,10 +26,10 @@ const ControlsModal = props => {
 
     return modalActive ? (
         <a.div className="controls-modal" style={modalSpring}>
-            <div className="unit-pad-container">
-                <label>Cube Padding</label>
+            <div className="pad-container unit">
+                <label for="unit-pad-input">Cube Padding:</label>
                 <input 
-                    className="unit-pad-input" 
+                    id="unit-pad-input" 
                     type="range" 
                     name="unitPad" 
                     min="0.1" 
@@ -38,10 +38,10 @@ const ControlsModal = props => {
                     defaultValue={unitPadPerc}
                     onChange={e => handleSlider(e)}></input>
             </div>
-            <div className="layer-pad-container">
-                <label>Layer Padding</label>
+            <div className="pad-container layer">
+                <label for="layer-pad-input">Layer Padding:</label>
                 <input 
-                    className="layer-pad-input" 
+                    id="layer-pad-input" 
                     type="range" 
                     name="layerPad" 
                     min="0" 

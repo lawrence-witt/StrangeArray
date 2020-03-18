@@ -108,14 +108,16 @@ export default function(state = initialState, action) {
         case CLEAR_STACK:
             return {
                 ...state,
-                currentPath: [],
+                currentPath: initialState.currentPath,
 
-                focusPosition: [0, 0, 0],
+                focusPosition: initialState.focusPosition,
+                unitPadPerc: initialState.unitPadPerc,
+                layerPadPerc: initialState.layerPadPerc,
 
-                activeFieldElements: [],
-                topFieldLayer: [],
-                activeRoots: [],
-                topRoot: []
+                activeFieldElements: initialState.activeFieldElements,
+                topFieldLayer: initialState.topFieldLayer,
+                activeRoots: initialState.activeRoots,
+                topRoot: initialState.topRoot
             }
         case INITIALISE_STACK:
             return {

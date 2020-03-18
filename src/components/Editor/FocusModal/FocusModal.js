@@ -9,14 +9,17 @@ import { focusElement, unfocusElements } from '../../../redux/actions/viewAction
 const FocusModal = props => {
     const { opened } = props;
     const { focussedElement, unfocusElements } = props;
+    const { type, content } = focussedElement.element;
+    const { path } = focussedElement;
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, modalSpring] = useModal(opened, [unfocusElements]);
+    const [modalActive, modalSpring] = useModal(opened, [], [unfocusElements]);
 
     return modalActive ? (
-        <a.div className="focus-modal" style={modalSpring}>
-            <h2 className="focus-type">{focussedElement.element.type}</h2>
-            <p className="focus-content">{focussedElement.element.content}</p>
+        <a.div className={`focus-modal ${type}`} style={modalSpring}>
+            <h2 className="focus-type">{type}</h2>
+            <p className="focus-path">{`[${path.join('] [')}]`}</p>
+            <p className="focus-content">{content}</p>
         </a.div>
     ) : null;
 }

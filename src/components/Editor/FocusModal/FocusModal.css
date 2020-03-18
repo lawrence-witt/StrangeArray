@@ -3,10 +3,42 @@
     width: 100%;
     max-width: 400px;
     height: 25%;
-    background-color: grey;
     z-index: 2;
     overflow-x: hidden;
     overflow-y: auto;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+    box-sizing: border-box;
+    border: 3px solid white;
+    border-top: unset;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background-color 0.5s;
+}
+
+.focus-modal p {
+    font-size: 0.9rem;
+}
+
+.focus-type {
+    flex: 1;
+}
+
+.focus-path {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    width: 80%;
+    border-bottom: 2px solid white;
+    white-space: nowrap;
+}
+
+.focus-content {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    flex: 3;
+    overflow-y: auto;
+    width: 80%;
+    word-wrap: break-word;
 }

@@ -11,7 +11,7 @@ const DownloadModal = props => {
     const outputRef = useRef();
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, modalSpring] = useModal(opened, []);
+    const [modalActive, modalSpring] = useModal(opened, [], []);
 
     /* COPY */
     const copyToClipboard = () => {

@@ -1,0 +1,30 @@
+.error-extension {
+    position: absolute;
+    display: flex;
+    bottom: 1px;
+    width: 100%;
+    z-index: -1;
+    transform-origin: bottom;
+    height: auto;
+    background-color: red;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    box-sizing: border-box;
+}
+
+.error-message-container {
+    width: 90%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.error-message {
+    word-wrap: break-word;
+}
+
+.error-button-container {
+    width: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
