@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import './SwapModal.css';
+import checkmark from '../../../assets/svgs/checkmark.svg';
 import { useModal } from '../../../utils/CustomHooks';
 import { resetSwap } from '../../../redux/actions/viewActions';
 import { swapStack } from '../../../redux/actions/stackActions';
@@ -12,7 +13,11 @@ const SwapModal = props => {
     const { pendingSwap, resetSwap, swapStack } = props;
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, modalSpring] = useModal(opened, [resetSwap], [resetSwap]);
+    const heightProps = {
+        height: pendingSwap[0].element.type || pendingSwap[1].element.type ? '25%' : '0%'
+    };
+
+    const [modalActive, modalSpring] = useModal(opened, [resetSwap], [resetSwap], heightProps);
 
     /* SUBMIT SWAP */
     function handleSwap() {
@@ -23,8 +28,8 @@ const SwapModal = props => {
     }
 
     return modalActive ? (
-        <a.div className="swap-modal" style={modalSpring}>
-            <h2 className="swap-title">Select Two Elements To Swap</h2>
+        <a.div className="editor-modal swap-modal" style={modalSpring}>
+            <h2 className="swap-title">Select Two Elements To Swap:</h2>
 
             <div className="swap-selection-container">
                 {pendingSwap[0].element.type ? (
@@ -46,10 +51,11 @@ const SwapModal = props => {
             
             <div className="swap-button-container">
                 {pendingSwap[0].element.type && pendingSwap[1].element.type ? (
-                    <button className="swap-button" onClick={handleSwap}>
-                        Confirm
-                    </button>
-                ): null}
+                    <img 
+                        className="swap-button"
+                        src={checkmark} 
+                        onClick={handleSwap}></img>
+                ) : null}
             </div>
         </a.div>
     ) : null;

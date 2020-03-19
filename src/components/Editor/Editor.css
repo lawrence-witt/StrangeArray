@@ -7,6 +7,10 @@
     align-items: center;
 }
 
+.editor-modal {
+    background-color: rgba(119, 136, 153, 0.4);
+}
+
 .e-buttons {
     position: absolute;
     bottom: 1rem;
@@ -21,9 +25,19 @@
 }
 
 .e-button {
-    height: 1rem;
-    padding: 5px;
+    height: 2rem;
     cursor: pointer;
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(276deg) brightness(106%) contrast(102%);
+    transition: margin-bottom 0.5s, filter 0.5s;
+}
+
+.e-button.selected {
+    filter: invert(18%) sepia(82%) saturate(3888%) hue-rotate(338deg) brightness(86%) contrast(100%);
+    margin-bottom: 2rem;
+}
+
+.e-button:hover {
+    filter: invert(18%) sepia(82%) saturate(3888%) hue-rotate(338deg) brightness(86%) contrast(100%);
 }
 
 .Array {

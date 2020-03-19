@@ -2,6 +2,7 @@ import React from 'react';
 import { a, useSpring } from 'react-spring';
 
 import './ErrorExtension.css';
+import close from '../../assets/svgs/close.svg';
 
 const ErrorExtension = props => {
     const { errorObject, errorSetter } = props;
@@ -9,13 +10,6 @@ const ErrorExtension = props => {
 
     const errorSpring = useSpring({
         transform: active ? 'scaleY(100%) translateY(100%)' : 'scaleY(0%) translateY(100%)',
-        /* transformOrigin: 'top' */
-        /* onRest: () => {
-            if(message && !active) {
-                console.log('error clean up');
-                errorSetter({active, message: ''});
-            }
-        } */
     })
 
     return (
@@ -24,7 +18,10 @@ const ErrorExtension = props => {
                 <p className="error-message">{message}</p>
             </div>
             <div className="error-button-container">
-                <button className="error-close" onClick={() => errorSetter({active: false, message})}>X</button>
+                <img 
+                    className="error-close"
+                    src={close} 
+                    onClick={() => errorSetter({active: false, message})}></img>
             </div>
         </a.div>
     )

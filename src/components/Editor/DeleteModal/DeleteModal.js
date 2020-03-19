@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import './DeleteModal.css';
+import checkmark from '../../../assets/svgs/checkmark.svg';
 import { useModal } from '../../../utils/CustomHooks';
 import { resetDeletion } from '../../../redux/actions/viewActions';
 import { removeFromStack } from '../../../redux/actions/stackActions';
@@ -13,7 +14,12 @@ const DeleteModal = props => {
     const { type, content } = pendingDeletion.element;
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, modalSpring] = useModal(opened, [resetDeletion], [resetDeletion]);
+    const heightProps = {
+        height: type ? '25%' : '0%'
+    };
+
+    const [modalActive, modalSpring] = useModal(opened, [resetDeletion], [resetDeletion], heightProps);
+
 
     /* RESPOND TO CLICK EVENTS */
     const handleDeletion = () => {
@@ -21,8 +27,8 @@ const DeleteModal = props => {
     }
 
     return modalActive ? (
-        <a.div className={`delete-modal ${type}`} style={modalSpring}>
-            <h2 className="delete-title">Select An Element To Delete</h2>
+        <a.div className={`editor-modal delete-modal ${type}`} style={modalSpring}>
+            <h2 className="delete-title">Select An Element To Delete:</h2>
 
             {type ? (
             <>
@@ -31,7 +37,10 @@ const DeleteModal = props => {
                 <p className="element-content">{content}</p>
             </div>
             <div className="delete-button-container">
-                <button className="confirm-delete-btn" onClick={handleDeletion}>Confirm</button>
+                <img 
+                    className="delete-button"
+                    src={checkmark} 
+                    onClick={handleDeletion}></img>
             </div>
             </>
             ): null}

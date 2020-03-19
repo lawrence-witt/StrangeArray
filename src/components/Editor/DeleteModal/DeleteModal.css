@@ -5,10 +5,11 @@
     align-items: center;
     width: 100%;
     max-width: 400px;
-    height: 25%;
+    min-height: 3rem;
     z-index: 2;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
+    color: white;
     border: 3px solid white;
     box-sizing: border-box;
     border-top: unset;
@@ -16,8 +17,11 @@
 }
 
 .delete-title {
+    margin-top: 0.8rem;
+    font-size: 1.2rem;
+    display: flex;
     flex: 1;
-    color: white;
+    justify-content: center;
     text-align: center;
 }
 
@@ -50,3 +54,16 @@
     align-items: center;
     justify-content: center;
 }
+
+    .delete-button {
+        cursor: pointer;
+        height: 1.3rem;
+        filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(276deg) brightness(106%) contrast(102%);
+        transition: filter 0.5s;
+        border: 2px solid black;
+        border-radius: 50px;
+    }
+
+    .delete-button:hover {
+        filter: unset;
+    }

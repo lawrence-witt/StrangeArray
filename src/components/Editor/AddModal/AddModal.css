@@ -4,12 +4,13 @@
     max-width: 400px;
     height: 25%;
     z-index: 1;
-    border: 3px solid white;
-    border-top: unset;
 }
 
 .selection-container {
     position: absolute;
+    border: 3px solid white;
+    border-top: unset;
+    box-sizing: border-box;
     z-index: 2;
     width: 100%;
     height: 100%;
@@ -100,6 +101,7 @@
             width: 80%;
             font-size: 0.85rem;
             font-weight: 700;
+            margin-bottom: 5px;
         }
 
         .input-box {
@@ -136,24 +138,37 @@
                 height: 25%;
                 margin: 10%;
                 border: 3px solid white;
+                opacity: 0.5;
                 color: white;
                 border-radius: 10px;
                 background-color: unset;
-                transition: border-color 0.2s, color 0.2s;
+                transition: opacity 0.2s;
             }
 
             .bool-button:hover {
-                color: black;
+                opacity: 1;
             }
 
             .bool-button.selected {
-                border-color: black;
-                color: black;
+                opacity: 1;
             }
 
     .input-button-container {
         flex: 1;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-evenly;
     }
+
+        .input-button {
+            cursor: pointer;
+            height: 1.3rem;
+            filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(276deg) brightness(106%) contrast(102%);
+            transition: filter 0.5s;
+            border: 2px solid black;
+            border-radius: 50px;
+        }
+
+        .input-button:hover {
+            filter: unset;
+        }

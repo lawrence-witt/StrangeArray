@@ -9,7 +9,7 @@ export function usePrevious(value) {
     return ref.current;
 }
 
-export function useModal(opened, mountFuncs, unmountFuncs) {
+export function useModal(opened, mountFuncs, unmountFuncs, customAnimation) {
     const [modalActive, setModalActive] = useState(false);
     const [modalEntering, setModalEntering] = useState(false);
     const prevEntering = usePrevious(modalEntering);
@@ -27,13 +27,13 @@ export function useModal(opened, mountFuncs, unmountFuncs) {
         if(modalEntering) setModalActive(true);
     }, [modalEntering])
 
-    const modalSpring = useSpring({
+    const modalSpring = useSpring(Object.assign(customAnimation, {
         transform: modalEntering ? 'translateY(0%)' : 'translateY(-100%)',
         onRest: () => {if(!modalEntering && prevEntering) {
             setModalActive(false);
             unmountFuncs.forEach(func => func());
         }}
-    });
+    }));
 
     return [modalActive, modalSpring];
 }

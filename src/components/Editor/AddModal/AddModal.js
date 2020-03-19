@@ -41,7 +41,7 @@ const AddModal = props => {
         function() {setModalStage('typeSelector')},
         function() {setDataModel(dataSchema)},
         function() {setInputError(errorSchema)}
-    ]);
+    ], {});
 
     useEffect(() => {
         if(!opened){
@@ -51,7 +51,7 @@ const AddModal = props => {
     }, [opened]);
 
     return modalActive ? (
-        <a.div className="add-modal" style={modalSpring}>
+        <a.div className="editor-modal add-modal" style={modalSpring}>
             <div className={`selection-container ${inputError.active ? 'error' : ''}`}>
                 <TypeSelector
                     dataSchema={dataSchema}

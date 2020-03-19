@@ -3,6 +3,10 @@ import { a, useSpring } from 'react-spring';
 import { connect } from 'react-redux';
 
 import './Home.css';
+import plus from '../../assets/svgs/plus.svg';
+import upload from '../../assets/svgs/upload.svg';
+import github from '../../assets/svgs/github-outline.svg';
+import ittLogo from '../../assets/svgs/itt-logo.svg';
 import UploadModal from './UploadModal/UploadModal';
 import { startTransition } from '../../redux/actions/viewActions';
 import { setCustomUserArray } from '../../redux/actions/stackActions';
@@ -11,6 +15,7 @@ const Home = props => {
     const { startTransition, setCustomUserArray, userUpload } = props;
     const [active, setActive] = useState(false);
     const [uploadModal, toggleUploadModal] = useState(false);
+    const [buttonSelect, setButtonSelect] = useState('');
 
     // On Mount
     useEffect(() => {
@@ -43,10 +48,24 @@ const Home = props => {
             <a.h1 className="title" style={titleSpring}>strange[Array]</a.h1>
             <UploadModal opened={uploadModal}/>
             <a.section className="h-buttons" style={buttonSpring}>
-                <button className="h-button" onClick={createHandler}>Create</button>
-                <button className="h-button" onClick={uploadHandler}>Upload</button>
-                <button className="h-button">Github</button>
-                <button className="h-button">itt.dev</button>
+                <img 
+                    className={`h-button ${buttonSelect === 'create' ? 'selected' : ''}`} 
+                    src={plus} 
+                    onClick={() => {
+                        createHandler();
+                        setButtonSelect('create');
+                    }}></img>
+                <img 
+                    className={`h-button ${buttonSelect === 'upload' ? 'selected' : ''}`} 
+                    src={upload} 
+                    onClick={() => {
+                        uploadHandler();
+                        buttonSelect === 'upload' ?
+                            setButtonSelect('') : 
+                            setButtonSelect('upload');
+                    }}></img>
+                <img className="h-button" src={github}></img>
+                <img className="h-button" src={ittLogo}></img>
             </a.section>
         </div>
     )

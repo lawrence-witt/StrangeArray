@@ -5,9 +5,11 @@
     flex-direction: column;
     width: 100%;
     max-width: 400px;
+    min-height: 3rem;
     height: 25%;
     color: white;
     border: 3px solid white;
+    border-top: unset;
     z-index: 2;
     overflow-x: hidden;
     overflow-y: auto;
@@ -15,7 +17,10 @@
 }
 
 .swap-title {
+    margin-top: 0.8rem;
+    font-size: 1.2rem;
     flex: 1;
+    text-align: center;
 }
 
 .swap-selection-container {
@@ -51,7 +56,8 @@
     }
 
     .ss-content {
-        padding: 5px 10px 5px 10px;
+        margin-top: 5px;
+        padding: 0px 10px 0px 10px;
         text-align: center;
         word-wrap: break-word;
         text-overflow: ellipsis;
@@ -64,3 +70,16 @@
     align-items: center;
     justify-content: center;
 }
+
+    .swap-button {
+        cursor: pointer;
+        height: 1.3rem;
+        filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(276deg) brightness(106%) contrast(102%);
+        transition: filter 0.5s;
+        border: 2px solid black;
+        border-radius: 50px;
+    }
+
+    .swap-button:hover {
+        filter: invert(18%) sepia(82%) saturate(3888%) hue-rotate(338deg) brightness(86%) contrast(100%);
+    }

@@ -13,7 +13,7 @@ const FocusModal = props => {
     const { path } = focussedElement;
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, modalSpring] = useModal(opened, [], [unfocusElements]);
+    const [modalActive, modalSpring] = useModal(opened, [], [unfocusElements], {});
 
     return modalActive ? (
         <a.div className={`focus-modal ${type}`} style={modalSpring}>

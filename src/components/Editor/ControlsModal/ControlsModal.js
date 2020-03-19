@@ -11,7 +11,7 @@ const ControlsModal = props => {
     const { unitPadPerc, layerPadPerc, updateUnitPadding, updateLayerPadding } = props;
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
-    const [modalActive, modalSpring] = useModal(opened, [], []);
+    const [modalActive, modalSpring] = useModal(opened, [], [], {});
 
     /* SLIDERS */
     const handleSlider = e => {
@@ -25,7 +25,7 @@ const ControlsModal = props => {
     }
 
     return modalActive ? (
-        <a.div className="controls-modal" style={modalSpring}>
+        <a.div className="editor-modal controls-modal" style={modalSpring}>
             <div className="pad-container unit">
                 <label for="unit-pad-input">Cube Padding:</label>
                 <input 
