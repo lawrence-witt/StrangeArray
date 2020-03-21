@@ -1,5 +1,5 @@
 // Dependencies
-import React, { Suspense, useRef, useState, useEffect, useMemo} from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import delay from 'delay';
 import PropTypes from 'prop-types';
@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import { useSpring, a } from 'react-spring/three';
 
 // Imported Sheets
-import { getCubeData, getFieldData, compensateFieldPositions } from '../../utils/Calculator';
+import { getCubeData, getFieldData } from '../../utils/Calculator';
 import ArrayCube from './ArrayCube';
 import PrimCube from './PrimCube';
 import { expandStack, collapseStack, refocusStack } from '../../redux/actions/stackActions';
@@ -25,8 +25,7 @@ const CubeGroup = props => {
     const newFieldDim = Math.ceil(Math.sqrt(groupArray.length)) > parentFieldDim ? Math.ceil(Math.sqrt(groupArray.length)) : parentFieldDim;
 
     const { defaultPositions, raisedPositions, cubeElementSize } = getCubeData(groupArray, position, size, unitPadPerc);
-    const { rawFieldPositions, fieldElementSize } = getFieldData(newFieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
-    const { trueFieldPositions, newFieldOffset } = compensateFieldPositions(rawFieldPositions, position, size, fieldElementSize, parentFieldOffset, layerPadPerc);
+    const { fieldPositions, fieldElementSize, newFieldOffset } = getFieldData(newFieldDim, masterBasePosition, baseFieldSize, unitPadPerc, position, size, parentFieldOffset, layerPadPerc);
 
     // Internal State
     const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
@@ -58,7 +57,7 @@ const CubeGroup = props => {
             if(inActiveRoots) {
                 setGroupPosition(position);
                 setChildSize(fieldElementSize);
-                setChildPositions(trueFieldPositions);
+                setChildPositions(fieldPositions);
             } else {
                 setGroupPosition(position);
                 setChildSize(cubeElementSize);
@@ -71,7 +70,7 @@ const CubeGroup = props => {
     useEffect(() => {
         if(!transitionActive) {
             if(groupSelected) {
-                setChildPositions(trueFieldPositions);
+                setChildPositions(fieldPositions);
                 setChildSize(fieldElementSize);
             } else {
                 setChildPositions(defaultPositions);
@@ -102,7 +101,7 @@ const CubeGroup = props => {
         if(expand) {
             setChildPositions(raisedPositions);
             await delay (500);
-            setChildPositions(trueFieldPositions);
+            setChildPositions(fieldPositions);
             setChildSize(fieldElementSize);
             setGroupSelected(true);
         } else {

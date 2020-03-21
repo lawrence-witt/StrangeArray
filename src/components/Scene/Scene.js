@@ -17,7 +17,7 @@ import { completeTransition } from '../../redux/actions/viewActions';
 import ConnectedCubeGroup from './CubeGroup';
 import PrimCube from './PrimCube';
 import Pedestal from './Pedestal';
-import { getFieldData} from '../../utils/Calculator';
+import { getBaseFieldData } from '../../utils/Calculator';
 
 extend({ OrbitControls });
 
@@ -105,11 +105,11 @@ const Scene = props => {
     const pedestalSize = [baseFieldSize, baseFieldSize*1.5, baseFieldSize];
     const fieldDim = Math.ceil(Math.sqrt(currentArray.length));
 
-    const { rawFieldPositions, fieldElementSize } = getFieldData(fieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
-    const transitionedPositions = rawFieldPositions.reduce((a, c) => [...a, [c[0], c[1]+baseFieldSize, c[2]]], []);
+    const { fieldPositions, fieldElementSize } = getBaseFieldData(fieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
+    const transitionedPositions = fieldPositions.reduce((a, c) => [...a, [c[0], c[1]+baseFieldSize, c[2]]], []);
 
     const [stackActive, setStackActive] = useState(true);
-    const [stackPosition, setStackPosition] = useState(rawFieldPositions);
+    const [stackPosition, setStackPosition] = useState(fieldPositions);
     const [stackOpacity, setStackOpacity] = useState(0);
     const [stackSuspended, setStackSuspended] = useState(false);
     const isMounted = useRef(false);
@@ -145,7 +145,7 @@ const Scene = props => {
                     setStackActive(true);
                     setStackSuspended(false);
                     setStackOpacity(1);
-                    setStackPosition(rawFieldPositions);
+                    setStackPosition(fieldPositions);
                 }
                 staggerTransitionIn();
             }
@@ -162,7 +162,7 @@ const Scene = props => {
     }, [userArray]);
 
     useEffect(() => {
-        setStackPosition(rawFieldPositions);
+        setStackPosition(fieldPositions);
     }, [currentArray]);
 
     // Load Index Marker Font
