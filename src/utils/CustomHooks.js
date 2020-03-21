@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useSpring } from 'react-spring';
 
 export function usePrevious(value) {
@@ -7,6 +7,16 @@ export function usePrevious(value) {
       ref.current = value;
     });
     return ref.current;
+}
+
+export function useCubeGroup(activeFieldElements, topFieldLayer, activeRoots, topRoot, path, parentOverridden) {
+    const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
+    const inTopField = useMemo(() => topFieldLayer.some(el => el.join(',') === path.join(',')), [topFieldLayer]);
+    const inActiveRoots = useMemo(() => activeRoots.some(el => el.join(',') === path.join(',')), [activeRoots]);
+    const isTopRoot = useMemo(() => topRoot.join(',') === path.join(','), [topRoot]);
+    const isOverridden = parentOverridden || (inActiveField && !inTopField && !inActiveRoots);
+
+    return [inActiveField, inTopField, inActiveRoots, isTopRoot, isOverridden];
 }
 
 export function useModal(opened, mountFuncs, unmountFuncs, customAnimation) {

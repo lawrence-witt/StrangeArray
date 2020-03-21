@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { useSpring, a } from 'react-spring/three';
 
 // Imported Sheets
+import { useCubeGroup } from '../../utils/CustomHooks';
 import { getCubeData, getFieldData } from '../../utils/Calculator';
 import ArrayCube from './ArrayCube';
 import PrimCube from './PrimCube';
@@ -28,11 +29,7 @@ const CubeGroup = props => {
     const { fieldPositions, fieldElementSize, newFieldOffset } = getFieldData(newFieldDim, masterBasePosition, baseFieldSize, unitPadPerc, position, size, parentFieldOffset, layerPadPerc);
 
     // Internal State
-    const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
-    const inTopField = useMemo(() => topFieldLayer.some(el => el.join(',') === path.join(',')), [topFieldLayer]);
-    const inActiveRoots = useMemo(() => activeRoots.some(el => el.join(',') === path.join(',')), [activeRoots]);
-    const isTopRoot = useMemo(() => topRoot.join(',') === path.join(','), [topRoot]);
-    const isOverridden = parentOverridden || (inActiveField && !inTopField && !inActiveRoots);
+    const [inActiveField, inTopField, inActiveRoots, isTopRoot, isOverridden] = useCubeGroup(activeFieldElements, topFieldLayer, activeRoots, topRoot, path, parentOverridden);
 
     const nextFieldPaths = groupArray.map((e, i) => [...path, i.toString()]);
     const nextFocus = parentFocus+(size[1]/2)+(fieldElementSize[1]/2)+layerPadPerc;
@@ -128,8 +125,10 @@ const CubeGroup = props => {
                 opacity={opacity}
                 index={index}
                 path={path}
+                
                 setGroupPosition={setGroupPosition}
                 stackHandler={stackHandler}
+
                 isOverridden={isOverridden}
                 parentSelected={parentSelected}
                 inActiveField={inActiveField}

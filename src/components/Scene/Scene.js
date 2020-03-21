@@ -98,7 +98,6 @@ const SceneLight = props => {
 }
 
 const Scene = props => {
-
     const { view, transitionActive, completeTransition, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc, activeRoots} = props;
 
     const [currentArray, setCurrentArray] = useState(demoArray);
@@ -113,15 +112,6 @@ const Scene = props => {
     const [stackOpacity, setStackOpacity] = useState(0);
     const [stackSuspended, setStackSuspended] = useState(false);
     const isMounted = useRef(false);
-
-    // Fade the stack in on mount
-    useEffect(() => {
-        async function fader() {
-            await delay(700);
-            setStackOpacity(1);
-        }
-        fader();
-    }, [])
 
     // Handle transition between user and demo arrays
     useEffect(() => {
@@ -177,7 +167,7 @@ const Scene = props => {
             <Controls focusPosition={focusPosition}/>
             <ambientLight/>
             <SceneLight focusPosition={focusPosition} baseFieldSize={baseFieldSize}/>
-            <Pedestal pedestalSize={pedestalSize} fieldElementSize={fieldElementSize} masterBasePosition={masterBasePosition}/>
+            <Pedestal pedestalSize={pedestalSize} fieldElementSize={fieldElementSize} masterBasePosition={masterBasePosition} setStackOpacity={setStackOpacity}/>
             <Provider store={store}>
             {stackSuspended ? null : currentArray.map((lowerElement, i) => {
                 return !stackPosition[i] ? null : Array.isArray(lowerElement) ? (

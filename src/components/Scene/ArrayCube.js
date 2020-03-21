@@ -76,7 +76,7 @@ const ArrayCube = props => {
             e.stopPropagation();
             if(inTopField && !highlighted) {
                 setHighlighted(true);
-                prepForDeletion({type: 'Array', content: path}, path);
+                prepForDeletion({type: 'Array', content: `[${path.join('] [')}]`}, path);
             } else if(inTopField && highlighted) {
                 setHighlighted(false);
                 prepForDeletion(null, null, false);

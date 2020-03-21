@@ -1,10 +1,11 @@
 // Dependencies
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { useSpring, a } from 'react-spring/three';
 import * as THREE from 'three';
 
 const Pedestal = props => {
-    const { pedestalSize, fieldElementSize, masterBasePosition } = props;
+    const { pedestalSize, fieldElementSize, masterBasePosition, setStackOpacity } = props;
+    const isMounted = useRef(false);
 
     const vertexShader = `
         attribute float alphaValue;
@@ -46,7 +47,14 @@ const Pedestal = props => {
 
     const aProps = useSpring({
         pPosition: pedestalPosition,
-        pSize: pedestalSize
+        pSize: pedestalSize,
+        onRest: () => {
+            if(isMounted.current) {
+                setStackOpacity(1);
+            } else {
+                isMounted.current = true;
+            }
+        }
     });
 
     return (

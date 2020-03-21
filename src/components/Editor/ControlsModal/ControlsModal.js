@@ -27,7 +27,7 @@ const ControlsModal = props => {
     return modalActive ? (
         <a.div className="editor-modal controls-modal" style={modalSpring}>
             <div className="pad-container unit">
-                <label for="unit-pad-input">Cube Padding:</label>
+                <label htmlFor="unit-pad-input">Cube Padding:</label>
                 <input 
                     id="unit-pad-input" 
                     type="range" 
@@ -39,7 +39,7 @@ const ControlsModal = props => {
                     onChange={e => handleSlider(e)}></input>
             </div>
             <div className="pad-container layer">
-                <label for="layer-pad-input">Layer Padding:</label>
+                <label htmlFor="layer-pad-input">Layer Padding:</label>
                 <input 
                     id="layer-pad-input" 
                     type="range" 

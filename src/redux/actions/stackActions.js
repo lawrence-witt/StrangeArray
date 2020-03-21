@@ -32,8 +32,7 @@ export const updateLayerPadding = newValue => dispatch => {
 export const refocusStack = newFocus => (dispatch, getState) => {
     const currentFocus = getState().stack.focusPosition;
 
-    // This is a temporary fix: the Calculator functions should be reworked during testing
-    newFocus = !newFocus ? [0, 0, 0] : [currentFocus[0], newFocus, currentFocus[2]];
+    newFocus = [currentFocus[0], newFocus, currentFocus[2]];
 
     dispatch({
         type: REFOCUS_STACK,
@@ -117,8 +116,7 @@ export const setRawUserArray = () => (dispatch, getState) => {
 export const expandStack = (newRoot, newFieldElements, newFocus) => (dispatch, getState) => {
     const currentFocus = getState().stack.focusPosition;
 
-    // This is a temporary fix: the Calculator functions should be reworked during testing
-    newFocus = !newFocus ? [0, 0, 0] : [currentFocus[0], newFocus, currentFocus[2]];
+    newFocus = [currentFocus[0], newFocus, currentFocus[2]];
 
     dispatch({
         type: EXPAND_STACK,
@@ -165,9 +163,6 @@ export const addToStack = newElement => (dispatch, getState) => {
     const topFieldLayer = getState().stack.topFieldLayer.slice();
     const topRoot = getState().stack.topRoot.slice();
 
-    // Takes in an array of indexes, the multidimensional array of elements it refers to, and a new element to insert. 
-    // Traverses the array of elements using the indexPath and pushes the new element at the final index.
-    // Example: ([0, 1], [[1, [2]], 3], 'element') returns [[1, [2, 'element']], 3].
     function traverseAdd(indexPath, array, element) {
         const idx = indexPath.shift();
         if (idx === undefined) return [...array, element];
