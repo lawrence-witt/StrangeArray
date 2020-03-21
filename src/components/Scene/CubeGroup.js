@@ -15,7 +15,7 @@ import { expandStack, collapseStack, refocusStack } from '../../redux/actions/st
 
 const CubeGroup = props => {
     // Parent Props
-    const { groupArray, index, path, depth, currentFieldPaths, position, size, opacity, parentSelected, parentOverridden, parentFieldDim, parentFieldOffset, parentFocus, font } = props;
+    const { groupArray, index, path, currentFieldPaths, position, size, opacity, parentSelected, parentOverridden, parentFieldDim, parentFieldOffset, parentFocus, font } = props;
     // Redux Props
     const { transitionActive, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeFieldElements, topFieldLayer, activeRoots, topRoot, editorState } = props;
     // Redux Actions
@@ -40,7 +40,7 @@ const CubeGroup = props => {
 
     const [groupSelected, setGroupSelected] = useState(false);
     const [groupPosition, setGroupPosition] = useState(() => {
-        return editorState.swap || editorState.delete ? [position[0], position[1]+size[1]/2, position[2]] : position;
+        return editorState.swap || editorState.remove ? [position[0], position[1]+size[1]/2, position[2]] : position;
     });
     const [childPositions, setChildPositions] = useState(defaultPositions);
     const [childSize, setChildSize] = useState(cubeElementSize);
@@ -88,7 +88,7 @@ const CubeGroup = props => {
     /* RESPOND TO CHILD COMPONENT CHANGES */
     const stackHandler = () => {
         if(inActiveField) {
-            if (groupSelected) {
+            if(groupSelected) {
                 collapseStack(path, currentFieldPaths, parentFocus);
                 changePositions(false);
             } else if(inTopField) {
@@ -128,8 +128,7 @@ const CubeGroup = props => {
                 size={size} 
                 opacity={opacity}
                 index={index}
-                path={path} 
-                depth={depth}
+                path={path}
                 setGroupPosition={setGroupPosition}
                 stackHandler={stackHandler}
                 isOverridden={isOverridden}
@@ -145,7 +144,6 @@ const CubeGroup = props => {
                         groupArray={lowerElement}
                         index={i}
                         path={nextFieldPaths[i]}
-                        depth={depth+1}
                         currentFieldPaths={nextFieldPaths}
                         position={childPositions[i].map(vec => vec/2)}
                         size={childSize}
@@ -169,6 +167,8 @@ const CubeGroup = props => {
 
                         groupSelected={groupSelected}
                         parentOverridden={isOverridden}
+                        inActiveField={inActiveRoots}
+                        inTopField={isTopRoot}
                         font={font}
                         key={nextFieldPaths[i].join(',')}/>
                 )
@@ -179,9 +179,6 @@ const CubeGroup = props => {
 
 const mapStateToProps = state => ({
     transitionActive: state.view.transitionActive,
-    deletionActive: state.view.deletionActive,
-    swapActive: state.view.swapActive,
-    controlsActive: state.view.controlsActive,
     editorState: state.view.editorState,
 
     masterBasePosition: state.stack.masterBasePosition,
@@ -196,9 +193,8 @@ const mapStateToProps = state => ({
 });
 
 CubeGroup.propTypes = {
-    prevTransitionActive: PropTypes.bool,
     transitionActive: PropTypes.bool,
-    swapActive: PropTypes.bool,
+    editorState: PropTypes.object,
 
     masterBasePosition: PropTypes.array,
     baseFieldSize: PropTypes.number,

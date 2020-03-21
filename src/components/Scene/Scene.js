@@ -99,7 +99,7 @@ const SceneLight = props => {
 
 const Scene = props => {
 
-    const { view, transitionActive, completeTransition, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc} = props;
+    const { view, transitionActive, completeTransition, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc, activeRoots} = props;
 
     const [currentArray, setCurrentArray] = useState(demoArray);
     const pedestalSize = [baseFieldSize, baseFieldSize*1.5, baseFieldSize];
@@ -185,7 +185,6 @@ const Scene = props => {
                         groupArray={lowerElement}
                         index={i}
                         path={[i.toString()]}
-                        depth={1}
                         currentFieldPaths={currentArray.map((e, i) => [i.toString()])}
                         position={stackPosition[i].map(vec => vec/2)}
                         size={fieldElementSize}
@@ -209,6 +208,8 @@ const Scene = props => {
 
                         groupSelected={true}
                         parentOverridden={false}
+                        inActiveField={true}
+                        inTopField={activeRoots.length === 0}
                         font={font}
                         key={[i].join(',')}/>
                 )
@@ -231,7 +232,9 @@ const mapStateToProps = state => ({
     masterBasePosition: state.stack.masterBasePosition,
     baseFieldSize: state.stack.baseFieldSize,
     unitPadPerc: state.stack.unitPadPerc,
-    layerPadPerc: state.stack.layerPadPerc
+    layerPadPerc: state.stack.layerPadPerc,
+
+    activeRoots: state.stack.activeRoots
 });
 
 Scene.propTypes = {
@@ -246,7 +249,9 @@ Scene.propTypes = {
     masterBasePosition: PropTypes.array,
     baseFieldSize: PropTypes.number,
     unitPadPerc: PropTypes.number,
-    layerPadPerc: PropTypes.number
+    layerPadPerc: PropTypes.number,
+
+    activeRoots: PropTypes.array
 }
 
 export default connect(mapStateToProps, { completeTransition })(Scene);

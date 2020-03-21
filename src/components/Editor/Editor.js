@@ -50,7 +50,7 @@ const Editor = props => {
     return (
         <div className="editor-container">
             <AddModal opened={editorState.add}/>
-            <DeleteModal opened={editorState.delete}/>
+            <DeleteModal opened={editorState.remove}/>
             <SwapModal opened={editorState.swap}/>
             <DownloadModal opened={editorState.download}/>
             <ControlsModal opened={editorState.controls}/>
@@ -62,9 +62,9 @@ const Editor = props => {
                     name="add"
                     onClick={modalHandler}></img>
                 <img 
-                    className={`e-button ${editorState.delete ? 'selected' : ''}`} 
+                    className={`e-button ${editorState.remove ? 'selected' : ''}`} 
                     src={minus} 
-                    name="delete"
+                    name="remove"
                     onClick={modalHandler}></img>
                 <img 
                     className={`e-button ${editorState.swap ? 'selected' : ''}`} 

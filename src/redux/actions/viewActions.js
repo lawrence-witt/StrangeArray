@@ -22,7 +22,6 @@ import {
 
 // Set the pointer to cursor on the canvas container when hovering on cube
 export const setHover = bool => dispatch => {
-
     dispatch({
         type: SET_HOVER,
         payload: bool
@@ -30,7 +29,6 @@ export const setHover = bool => dispatch => {
 }
 
 export const setEditorState = mode => (dispatch, getState) => {
-    // Possily rework all this use to use initial state in the reducer instead?
     const editorState = getState().view.editorState;
 
     const newEditState = Object.keys(editorState).reduce((obj, key) => {
@@ -48,7 +46,6 @@ export const setEditorState = mode => (dispatch, getState) => {
 
 // Notifies the home/edit overlays when user submits custom array
 export const setUserUpload = bool => dispatch => {
-
     dispatch({
         type: SET_USER_UPLOAD,
         payload: bool
@@ -57,7 +54,6 @@ export const setUserUpload = bool => dispatch => {
 
 // Reset all information about stack placement in the store and signal current stack to transition out
 export const startTransition = destination => dispatch => {
-
     dispatch({ 
         type: CLEAR_STACK 
     });
@@ -88,8 +84,6 @@ export const completeTransition = () => (dispatch, getState) => {
 
 // Place a new focussed element in the store, or reset it
 export const focusElement = (element, path) => (dispatch, getState) => {
-    
-
     dispatch({
         type: FOCUS_ELEMENT,
         payload: {
@@ -100,7 +94,6 @@ export const focusElement = (element, path) => (dispatch, getState) => {
 }
 
 export const unfocusElements = () => dispatch => {
-
     dispatch({
         type: UNFOCUS_ELEMENTS
     })
@@ -109,7 +102,6 @@ export const unfocusElements = () => dispatch => {
 
 // Single out an element for deletion confirmation when it is clicked on in deletion mode, reset the stored value when modal closes
 export const prepForDeletion = (element, path, add=true) => dispatch => {
-
     if(add) {
         dispatch({ 
             type: PREP_FOR_DELETION,
@@ -133,14 +125,12 @@ export const prepForDeletion = (element, path, add=true) => dispatch => {
 }
 
 export const resetDeletion = () => dispatch => {
-
     dispatch({
         type: RESET_DELETION
     })
 }
 
 export const prepForSwap = (element, path, add=true) => (dispatch, getState) => {
-    
     const pendingSwap = Object.assign({}, getState().view.pendingSwap);
 
     if(add) {
@@ -178,7 +168,6 @@ export const prepForSwap = (element, path, add=true) => (dispatch, getState) => 
 }
 
 export const resetSwap = () => dispatch => {
-
     dispatch({
         type: RESET_SWAP
     });

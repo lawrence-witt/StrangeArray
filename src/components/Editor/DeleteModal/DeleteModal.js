@@ -20,12 +20,6 @@ const DeleteModal = props => {
 
     const [modalActive, modalSpring] = useModal(opened, [resetDeletion], [resetDeletion], heightProps);
 
-
-    /* RESPOND TO CLICK EVENTS */
-    const handleDeletion = () => {
-        removeFromStack();
-    }
-
     return modalActive ? (
         <a.div className={`editor-modal delete-modal ${type}`} style={modalSpring}>
             <h2 className="delete-title">Select An Element To Delete:</h2>
@@ -40,7 +34,7 @@ const DeleteModal = props => {
                 <img 
                     className="delete-button"
                     src={checkmark} 
-                    onClick={handleDeletion}></img>
+                    onClick={removeFromStack}></img>
             </div>
             </>
             ): null}

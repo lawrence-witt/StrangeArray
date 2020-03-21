@@ -25,7 +25,7 @@ const initialState = {
 
     editorState: {
         add: false,
-        delete: false,
+        remove: false,
         swap: false,
         download: false,
         controls: false,
@@ -112,10 +112,6 @@ export default function(state = initialState, action) {
         case UNFOCUS_ELEMENTS:
             return {
                 ...state,
-                editorState: {
-                    ...state.editorState,
-                    focus: false
-                },
                 focussedElement: initialState.focussedElement
             }
         case PREP_FOR_DELETION:

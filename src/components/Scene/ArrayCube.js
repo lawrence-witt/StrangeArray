@@ -1,21 +1,19 @@
 // Dependencies
-import React, { useRef, useMemo, useState, useEffect} from 'react';
+import React, { useMemo, useState, useEffect} from 'react';
 import { connect } from 'react-redux';
-import { Canvas, useFrame, useThree, extend, useLoader} from 'react-three-fiber';
+import PropTypes from 'prop-types';
 import { useSpring, a } from 'react-spring/three';
-import delay from 'delay';
 import * as THREE from 'three';
 
 // Imported Sheets
-import { usePrevious } from '../../utils/CustomHooks';
 import IndexMarker from './IndexMarker';
 import { setHover, prepForDeletion, prepForSwap, setEditorState, focusElement, unfocusElements } from '../../redux/actions/viewActions';
 
 const ArrayCube = props => {
     // Parent Props
-    let { element, position, size, opacity, path, depth, stackHandler, setGroupPosition, parentSelected, inActiveRoots, inActiveField, inTopField, isOverridden, font, index } = props;
+    let { element, position, size, opacity, path, stackHandler, setGroupPosition, parentSelected, inActiveRoots, inActiveField, inTopField, isOverridden, font, index } = props;
     // Redux Props
-    let { view, dimensions, hoverActive, pendingDeletion, pendingSwap, editorState } = props;
+    let { view, hoverActive, pendingDeletion, pendingSwap, editorState } = props;
     // Redux Actions
     let { setHover, setEditorState, prepForDeletion, prepForSwap, unfocusElements } = props;
 
@@ -23,11 +21,11 @@ const ArrayCube = props => {
     /* RESPOND TO REDUX CHANGES */
     const [displayState, setdisplayState] = useState('collapsed');
     const [highlighted, setHighlighted] = useState(false);
-    const [relativeStrength, setRelativeStrength] = useState(0);
-
+    
+    // Set display state
     useEffect(() => {
         inTopField ? 
-            setdisplayState('focussed') :
+            setdisplayState('topLayer') :
         inActiveRoots ?
             setdisplayState('expanded') :
         isOverridden ?
@@ -35,31 +33,25 @@ const ArrayCube = props => {
             setdisplayState('collapsed');
     }, [inActiveRoots, inTopField, isOverridden]);
 
+    // Unhighlight self on new editor state
     useEffect(() => {
-        const newStrength = 1 - (1/dimensions)*depth === 0 ? 10 :
-                            Math.round((1 - (1/dimensions)*depth)*100);
-        setRelativeStrength(newStrength);
-    }, [dimensions]);
+        setHighlighted(false);
+    }, [editorState]);
 
-    // Unhighlight self when another cube is selected/unselected for deletion
+    // Unhighlight self when removed from delete/swap
     useEffect(() => {
-        if(!editorState.delete || 
-           !pendingDeletion || 
-           path.join(',') !== pendingDeletion.path.join(',')) {
+        const pathString = path.join(',');
+        const pathChecks = [
+            pendingDeletion.path.join(','),
+            pendingSwap[0].path.join(','),
+            pendingSwap[1].path.join(',')
+        ];
+        if(!pathChecks.some(check => pathString === check)) {
             setHighlighted(false);
         }
-    }, [editorState.delete, pendingDeletion]);
+    }, [pendingDeletion, pendingSwap]);
 
-    // Unhighlight self when another cube is selected/unselected for swap
-    useEffect(() => {
-        if(!editorState.swap ||
-            path.join(',') !== pendingSwap[0].path.join(',') &&
-            path.join(',') !== pendingSwap[1].path.join(',')) {
-                setHighlighted(false);
-            }
-    }, [editorState.swap, pendingSwap]);
-
-    // Alter the cube position based on changes to highlight state
+    // Alter the parent group position based on changes to highlight state
     useEffect(() => {
         highlighted ? 
             setGroupPosition([position[0], position[1]+size[1]/2, position[2]]) : 
@@ -79,14 +71,13 @@ const ArrayCube = props => {
 
     /* RESPOND TO MOUSE EVENTS */
     const arrayClickHandler = e => {
-        if(editorState.controls) return;
-        if(editorState.delete && inTopField) {
+        if(editorState.remove) {
 
             e.stopPropagation();
-            if(!highlighted) {
+            if(inTopField && !highlighted) {
                 setHighlighted(true);
                 prepForDeletion({type: 'Array', content: path}, path);
-            } else if(highlighted) {
+            } else if(inTopField && highlighted) {
                 setHighlighted(false);
                 prepForDeletion(null, null, false);
             }
@@ -110,18 +101,28 @@ const ArrayCube = props => {
 
             e.stopPropagation();
             unfocusElements();
-            /* setEditorState(null); */
+            setEditorState(null);
             stackHandler();
         }
     }
 
     const hoverHandler = (e, entering) => {
-        if(displayState === 'focussed' || displayState === 'expanded') {
+        if(displayState === 'topLayer' || displayState === 'expanded') {
             e.stopPropagation();
-            if(entering && !hoverActive && !editorState.controls) {
-                setHover(true);
-            } else if (!entering) {
-                setHover(false);
+            if(displayState === 'topLayer') {
+                if(entering && !hoverActive) {
+                    setHover(true);
+                } else if(!entering){
+                    setHover(false);
+                }
+            } else if(displayState === 'expanded') {
+                if(editorState.swap || editorState.remove) {
+                    return;
+                } else if(entering && !hoverActive) {
+                    setHover(true);
+                } else if(!entering){
+                    setHover(false);
+                }
             }
         }
     }
@@ -162,21 +163,18 @@ const mapStateToProps = state => ({
     view: state.view.view,
     editorState: state.view.editorState,
     hoverActive: state.view.hoverActive,
-    deletionActive: state.view.deletionActive,
     pendingDeletion: state.view.pendingDeletion,
-    swapActive: state.view.swapActive,
     pendingSwap: state.view.pendingSwap,
-    controlsActive: state.view.controlsActive,
-
-    dimensions: state.stack.dimensions,
-
-    masterBasePosition: state.stack.masterBasePosition,
-    baseFieldSize: state.stack.baseFieldSize,
-    unitPadPerc: state.stack.unitPadPerc,
-    layerPadPerc: state.stack.layerPadPerc,
-
-    activeFieldElements: state.stack.activeFieldElements,
-    topFieldLayer: state.stack.topFieldLayer
 });
 
-export default connect(mapStateToProps, { setHover, prepForDeletion, prepForSwap, setEditorState, focusElement, unfocusElements })(ArrayCube);
+ArrayCube.propTypes = {
+    view: PropTypes.string,
+    editorState: PropTypes.object,
+    hoverActive: PropTypes.bool,
+    pendingDeletion: PropTypes.object,
+    pendingSwap: PropTypes.object,
+}
+
+export default connect(mapStateToProps, { 
+    setHover, prepForDeletion, prepForSwap, setEditorState, focusElement, unfocusElements 
+})(ArrayCube);
