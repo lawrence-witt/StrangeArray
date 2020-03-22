@@ -16,7 +16,7 @@ import { expandStack, collapseStack, refocusStack } from '../../redux/actions/st
 
 const CubeGroup = props => {
     // Parent Props
-    const { groupArray, index, path, currentFieldPaths, position, size, opacity, parentSelected, parentOverridden, parentFieldDim, parentFieldOffset, parentFocus, font } = props;
+    const { groupArray, index, path, currentFieldPaths, position, size, opacity, parentSelected, parentOverridden, parentFieldDim, parentFieldOffset, parentFocus, layerGapFactor, font } = props;
     // Redux Props
     const { transitionActive, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeFieldElements, topFieldLayer, activeRoots, topRoot, editorState } = props;
     // Redux Actions
@@ -26,7 +26,7 @@ const CubeGroup = props => {
     const newFieldDim = Math.ceil(Math.sqrt(groupArray.length)) > parentFieldDim ? Math.ceil(Math.sqrt(groupArray.length)) : parentFieldDim;
 
     const { defaultPositions, raisedPositions, cubeElementSize } = getCubeData(groupArray, position, size, unitPadPerc);
-    const { fieldPositions, fieldElementSize, newFieldOffset } = getFieldData(newFieldDim, masterBasePosition, baseFieldSize, unitPadPerc, position, size, parentFieldOffset, layerPadPerc);
+    const { fieldPositions, fieldElementSize, newFieldOffset, newBaseOffset } = getFieldData(newFieldDim, masterBasePosition, baseFieldSize, unitPadPerc, position, size, parentFieldOffset, layerPadPerc);
 
     // Internal State
     const [inActiveField, inTopField, inActiveRoots, isTopRoot, isOverridden] = useCubeGroup(activeFieldElements, topFieldLayer, activeRoots, topRoot, path, parentOverridden);
@@ -134,6 +134,8 @@ const CubeGroup = props => {
                 inActiveField={inActiveField}
                 inTopField={inTopField}
                 inActiveRoots={inActiveRoots}
+
+                layerGapFactor={layerGapFactor}
                 font={font}/>
 
             {groupArray.map((lowerElement, i) => {
@@ -152,6 +154,8 @@ const CubeGroup = props => {
                         parentFieldDim={newFieldDim}
                         parentFieldOffset={newFieldOffset}
                         parentFocus={nextFocus}
+
+                        layerGapFactor={layerGapFactor}
                         font={font}
                         key={nextFieldPaths[i].join(',')}/>
                 ) : (
@@ -167,6 +171,8 @@ const CubeGroup = props => {
                         parentOverridden={isOverridden}
                         inActiveField={inActiveRoots}
                         inTopField={isTopRoot}
+
+                        layerGapFactor={layerGapFactor}
                         font={font}
                         key={nextFieldPaths[i].join(',')}/>
                 )

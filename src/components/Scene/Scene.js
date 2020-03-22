@@ -1,5 +1,5 @@
 // Dependencies
-import React, { Suspense, useRef, useState, useEffect, useMemo} from 'react';
+import React, { useRef, useState, useEffect, useMemo} from 'react';
 import { Provider, connect } from 'react-redux';
 import delay from 'delay';
 import PropTypes from 'prop-types';
@@ -98,15 +98,19 @@ const SceneLight = props => {
 }
 
 const Scene = props => {
-    const { view, transitionActive, completeTransition, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc, activeRoots} = props;
+    const { view, transitionActive, completeTransition, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeRoots} = props;
 
+    // Active array state
     const [currentArray, setCurrentArray] = useState(demoArray);
+
+    // Position/size config
     const pedestalSize = [baseFieldSize, baseFieldSize*1.5, baseFieldSize];
     const fieldDim = Math.ceil(Math.sqrt(currentArray.length));
-
     const { fieldPositions, fieldElementSize } = getBaseFieldData(fieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
     const transitionedPositions = fieldPositions.reduce((a, c) => [...a, [c[0], c[1]+baseFieldSize, c[2]]], []);
+    const layerGapFactor = layerPadPerc*(100/fieldElementSize[0]);
 
+    // Internal state
     const [stackActive, setStackActive] = useState(true);
     const [stackPosition, setStackPosition] = useState(fieldPositions);
     const [stackOpacity, setStackOpacity] = useState(0);
@@ -167,7 +171,11 @@ const Scene = props => {
             <Controls focusPosition={focusPosition}/>
             <ambientLight/>
             <SceneLight focusPosition={focusPosition} baseFieldSize={baseFieldSize}/>
-            <Pedestal pedestalSize={pedestalSize} fieldElementSize={fieldElementSize} masterBasePosition={masterBasePosition} setStackOpacity={setStackOpacity}/>
+            <Pedestal 
+                pedestalSize={pedestalSize} 
+                fieldElementSize={fieldElementSize} 
+                masterBasePosition={masterBasePosition} 
+                setStackOpacity={setStackOpacity}/>
             <Provider store={store}>
             {stackSuspended ? null : currentArray.map((lowerElement, i) => {
                 return !stackPosition[i] ? null : Array.isArray(lowerElement) ? (
@@ -185,6 +193,8 @@ const Scene = props => {
                         parentFieldDim={fieldDim}
                         parentFieldOffset={masterBasePosition}
                         parentFocus={0}
+
+                        layerGapFactor={layerGapFactor}
                         font={font}
                         key={[i].join(',')}/>
                 ) : (
@@ -196,10 +206,12 @@ const Scene = props => {
                         size={fieldElementSize}
                         opacity={stackOpacity}
 
-                        groupSelected={true}
+                        groupSelected={stackActive}
                         parentOverridden={false}
                         inActiveField={true}
                         inTopField={activeRoots.length === 0}
+
+                        layerGapFactor={layerGapFactor}
                         font={font}
                         key={[i].join(',')}/>
                 )

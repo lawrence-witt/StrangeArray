@@ -6,6 +6,7 @@ import * as THREE from 'three';
 const Pedestal = props => {
     const { pedestalSize, fieldElementSize, masterBasePosition, setStackOpacity } = props;
     const isMounted = useRef(false);
+    const isEntered = useRef(false);
 
     const vertexShader = `
         attribute float alphaValue;
@@ -49,8 +50,9 @@ const Pedestal = props => {
         pPosition: pedestalPosition,
         pSize: pedestalSize,
         onRest: () => {
-            if(isMounted.current) {
+            if(isMounted.current && !isEntered.current) {
                 setStackOpacity(1);
+                isEntered.current = true;
             } else {
                 isMounted.current = true;
             }

@@ -1,5 +1,4 @@
 export const getBaseFieldData = (fieldDim, masterBasePosition, baseFieldSize, unitPadPerc) => {
-
     // The length of one size of a field unit
     let cubeUnitLength = baseFieldSize/fieldDim;
     // The size of each unit on the field
@@ -12,11 +11,10 @@ export const getBaseFieldData = (fieldDim, masterBasePosition, baseFieldSize, un
     // Apply 'padding' to each cube on the field
     let fieldElementSize = cubeUnitSize.map(side => side - side*unitPadPerc);
 
-    return { fieldPositions, fieldElementSize };
+    return {fieldPositions, fieldElementSize};
 }
 
 export const getFieldData = (fieldDim, masterBasePosition, baseFieldSize, unitPadPerc, position, size, parentFieldOffset, layerPadPerc) => {
-
     // The length of one size of a field unit
     let cubeUnitLength = baseFieldSize/fieldDim;
     // The size of each unit on the field
@@ -30,13 +28,12 @@ export const getFieldData = (fieldDim, masterBasePosition, baseFieldSize, unitPa
     let fieldElementSize = cubeUnitSize.map(side => side - side*unitPadPerc);
 
     // Compensate the positions based on the field's height in the stack
-    const {trueFieldPositions, newFieldOffset} = compensateFieldPositions(rawFieldPositions, position, size, fieldElementSize, parentFieldOffset, layerPadPerc);
+    const {trueFieldPositions, newFieldOffset, newBaseOffset} = compensateFieldPositions(rawFieldPositions, position, size, fieldElementSize, parentFieldOffset, layerPadPerc);
 
-    return {fieldPositions: trueFieldPositions, fieldElementSize, newFieldOffset};
+    return {fieldPositions: trueFieldPositions, fieldElementSize, newFieldOffset, newBaseOffset};
 }
 
 export const getCubeData = (array, position, size, padPerc) => {
-
     // The length of one side of the CubeGroup
     let cubeLength = size[0];
 
@@ -63,11 +60,7 @@ export const getCubeData = (array, position, size, padPerc) => {
 }
 
 function compensateFieldPositions(fieldPositions, position, size, fieldElementSize, parentFieldOffset, layerPadPerc) {
-    const newFieldOffset = [
-        position[0]+parentFieldOffset[0], 
-        position[1]+parentFieldOffset[1], 
-        position[2]+parentFieldOffset[2]
-    ];
+    const newFieldOffset = position.map((pos, i) => pos+parentFieldOffset[i]);
     const newBaseOffset = position[1]+fieldElementSize[1]/2+size[1]/2+layerPadPerc;
     const trueFieldPositions = fieldPositions.map(fPosition => {
         return [
@@ -77,7 +70,7 @@ function compensateFieldPositions(fieldPositions, position, size, fieldElementSi
         ];
     });
 
-    return {trueFieldPositions, newFieldOffset};
+    return {trueFieldPositions, newFieldOffset, newBaseOffset};
 }
 
 // Returns an array of zeroed vertices which denote the center points

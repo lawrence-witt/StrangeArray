@@ -11,7 +11,7 @@ import { setHover, prepForDeletion, prepForSwap, setEditorState, focusElement, u
 
 const ArrayCube = props => {
     // Parent Props
-    let { element, position, size, opacity, path, stackHandler, setGroupPosition, parentSelected, inActiveRoots, inActiveField, inTopField, isOverridden, font, index } = props;
+    let { element, position, size, opacity, path, stackHandler, setGroupPosition, parentSelected, inActiveRoots, inActiveField, inTopField, isOverridden, layerGapFactor, font, index } = props;
     // Redux Props
     let { view, hoverActive, pendingDeletion, pendingSwap, editorState } = props;
     // Redux Actions
@@ -153,7 +153,7 @@ const ArrayCube = props => {
             </lineSegments>
             
             {displayState !== 'overridden' && parentSelected && view !== 'home' ? (
-                <IndexMarker font={font} index={index} cubeSize={cubeSize}/>
+                <IndexMarker layerGapFactor={layerGapFactor} inTopField={inTopField} font={font} index={index}/>
             ) : null}
         </a.mesh>
     )
@@ -165,6 +165,8 @@ const mapStateToProps = state => ({
     hoverActive: state.view.hoverActive,
     pendingDeletion: state.view.pendingDeletion,
     pendingSwap: state.view.pendingSwap,
+
+    layerPadPerc: state.stack.layerPadPerc
 });
 
 ArrayCube.propTypes = {

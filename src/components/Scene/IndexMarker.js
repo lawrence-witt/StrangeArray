@@ -3,21 +3,31 @@ import { useSpring, a } from 'react-spring/three';
 import * as THREE from 'three';
 
 const IndexMarker = props => {
-    const { font, cubeSize } = props;
+    const { font, layerGapFactor, inTopField } = props;
     const index = JSON.stringify(props.index);
 
-    // Size should be calculate with layer padding in mind
+    const rawScale = layerGapFactor/100;
+
+    const scaleCalc = inTopField || rawScale > 0.25 ? 0.25 : 
+                                    rawScale > 0 ? rawScale : 0.001;
+
+    const indexScale = new Array(3).fill(scaleCalc);
+
+    const indexSpring = useSpring({
+        scale: indexScale
+    })
+
     const config = useMemo(() => ({
-        font, hAlign: "center", size: cubeSize[0]/10, height: cubeSize[0]/50
-    }), [font, cubeSize]);
+        font, hAlign: "center", size: 1, height: 0.25
+    }), [font]);
 
     const color = useMemo(() => new THREE.Color('gold'), []);
 
     return (
-        <mesh position={[-0.5, 0.6, -0.5]}>
+        <a.mesh position={[-0.5, 0.51, -0.5]} scale={indexSpring.scale}>
             <textGeometry attach="geometry" args={[index, config]}/>
-            <meshPhysicalMaterial attach="material" color={color}/>
-        </mesh>
+            <meshBasicMaterial attach="material" color={color}/>
+        </a.mesh>
     )
 }
 

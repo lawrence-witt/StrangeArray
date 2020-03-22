@@ -15,7 +15,6 @@ import {
 const initialState = {
     demoArray: [[[[[[[{type: 'Boolean', content: true}]]]]]]],
     rawUserArray: '',
-    //demoArray: [{type: 'Null', content: null}, [{type: 'Number', content: 6}, {type: 'String', content: "hello"}], {type: 'String', content: "hello"}, {type: 'String', content: "hello"}, {type: 'String', content: "hello"}],
     userArray: [],
     currentPath: [],
     dimensions: 6,
@@ -24,7 +23,7 @@ const initialState = {
     focusPosition: [0, 0, 0],
     baseFieldSize: 6,
     unitPadPerc: 0.3,
-    layerPadPerc: 0.5,
+    layerPadPerc: 1,
 
     activeFieldElements: [],
     topFieldLayer: [],

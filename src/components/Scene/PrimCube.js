@@ -10,7 +10,7 @@ import IndexMarker from './IndexMarker';
 
 const PrimCube = props => {
     // Parent props
-    const {element, index, position, size, opacity, path, groupSelected, parentOverridden, inActiveField, inTopField, font} = props;
+    const {element, index, position, size, opacity, path, groupSelected, parentOverridden, inActiveField, inTopField, font, layerGapFactor} = props;
     // Redux Props
     const {view, editorState, pendingDeletion, hoverActive, focussedElement, pendingSwap} = props;
     // Redux Actions
@@ -159,7 +159,7 @@ const PrimCube = props => {
             <a.meshPhongMaterial attach="material" transparent color={cubeColor} opacity={aProps.cOpacity}/>
             
             {displayState === 'topLayer' && groupSelected && view !== 'home' ? (
-                <IndexMarker font={font} index={index} cubeSize={cubeSize}/>
+                <IndexMarker layerGapFactor={layerGapFactor} inTopField={inTopField} font={font} index={index}/>
             ) : null}
 
         </a.mesh>
@@ -172,7 +172,7 @@ const mapStateToProps = state => ({
     hoverActive: state.view.hoverActive,
     focussedElement: state.view.focussedElement,
     pendingDeletion: state.view.pendingDeletion,
-    pendingSwap: state.view.pendingSwap,
+    pendingSwap: state.view.pendingSwap
 });
 
 PrimCube.propTypes = {
