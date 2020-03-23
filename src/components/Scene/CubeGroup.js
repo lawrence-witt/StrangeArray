@@ -22,11 +22,17 @@ const CubeGroup = props => {
     // Redux Actions
     const { expandStack, collapseStack, refocusStack } = props;
 
+
     // Position/Size Config
     const newFieldDim = Math.ceil(Math.sqrt(groupArray.length)) > parentFieldDim ? Math.ceil(Math.sqrt(groupArray.length)) : parentFieldDim;
 
     const { defaultPositions, raisedPositions, cubeElementSize } = getCubeData(groupArray, position, size, unitPadPerc);
     const { fieldPositions, fieldElementSize, newFieldOffset } = getFieldData(newFieldDim, masterBasePosition, baseFieldSize, unitPadPerc, position, size, parentFieldOffset, layerPadPerc);
+
+    useEffect(() => {
+        console.log(newFieldDim);
+    }, [newFieldDim]);
+
 
     // Internal State
     const [inActiveField, inTopField, inActiveRoots, isTopRoot, isOverridden] = useCubeGroup(activeFieldElements, topFieldLayer, activeRoots, topRoot, path, parentOverridden);
@@ -74,7 +80,7 @@ const CubeGroup = props => {
                 setChildSize(cubeElementSize);
             }
         }
-    }, [groupArray])
+    }, [groupArray, newFieldDim]);
 
     useEffect(() => {
         if (!parentSelected) setGroupSelected(false);
