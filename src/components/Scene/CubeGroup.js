@@ -26,7 +26,7 @@ const CubeGroup = props => {
     const newFieldDim = Math.ceil(Math.sqrt(groupArray.length)) > parentFieldDim ? Math.ceil(Math.sqrt(groupArray.length)) : parentFieldDim;
 
     const { defaultPositions, raisedPositions, cubeElementSize } = getCubeData(groupArray, position, size, unitPadPerc);
-    const { fieldPositions, fieldElementSize, newFieldOffset, newBaseOffset } = getFieldData(newFieldDim, masterBasePosition, baseFieldSize, unitPadPerc, position, size, parentFieldOffset, layerPadPerc);
+    const { fieldPositions, fieldElementSize, newFieldOffset } = getFieldData(newFieldDim, masterBasePosition, baseFieldSize, unitPadPerc, position, size, parentFieldOffset, layerPadPerc);
 
     // Internal State
     const [inActiveField, inTopField, inActiveRoots, isTopRoot, isOverridden] = useCubeGroup(activeFieldElements, topFieldLayer, activeRoots, topRoot, path, parentOverridden);
@@ -129,8 +129,8 @@ const CubeGroup = props => {
                 setGroupPosition={setGroupPosition}
                 stackHandler={stackHandler}
 
-                isOverridden={isOverridden}
                 parentSelected={parentSelected}
+                isOverridden={isOverridden}
                 inActiveField={inActiveField}
                 inTopField={inTopField}
                 inActiveRoots={inActiveRoots}
@@ -167,7 +167,6 @@ const CubeGroup = props => {
                         size={childSize}
                         opacity={opacity}
 
-                        groupSelected={groupSelected}
                         parentOverridden={isOverridden}
                         inActiveField={inActiveRoots}
                         inTopField={isTopRoot}

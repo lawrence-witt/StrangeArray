@@ -22,11 +22,11 @@ import { getBaseFieldData } from '../../utils/Calculator';
 extend({ OrbitControls });
 
 const Controls = props => {
-    const { focusPosition } = props;
+    const focusPoint = props.focusPosition[1];
     const { camera, gl } = useThree();
     const orbitRef = useRef();
 
-    const [ targetY, setTargetY ] = useState(focusPosition[1]);
+    const [ targetY, setTargetY ] = useState(focusPoint);
     const [ prevTargetY, setPrevTargetY ] = useState(targetY);
 
     const [ positionY, setPositionY ] = useState(camera.position.y);
@@ -38,12 +38,12 @@ const Controls = props => {
 
     useEffect(() => {
         setPrevTargetY(targetY);
-        setTargetY(focusPosition[1]);
-    }, [focusPosition]);
+        setTargetY(focusPoint);
+        setPositionY(camera.position.y);
+    }, [focusPoint]);
 
     useEffect(() => {
         if(targetY !== prevTargetY) {
-            setPositionY(camera.position.y);
             setRefocusActive(true);
         }
     }, [targetY])
@@ -56,7 +56,9 @@ const Controls = props => {
     const { positionSpring } = useSpring({
         from: { positionSpring: positionY },
         positionSpring: targetY,
-        onRest: () => setRefocusActive(false)
+        onRest: () => {
+            setRefocusActive(false);
+        }
     });
   
     useFrame(() => {
@@ -104,7 +106,7 @@ const Scene = props => {
     const [currentArray, setCurrentArray] = useState(demoArray);
 
     // Position/size config
-    const pedestalSize = [baseFieldSize, baseFieldSize*1.5, baseFieldSize];
+    const pedestalSize = useMemo(() => [baseFieldSize, baseFieldSize*1.5, baseFieldSize], [baseFieldSize]);
     const fieldDim = Math.ceil(Math.sqrt(currentArray.length));
     const { fieldPositions, fieldElementSize } = getBaseFieldData(fieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
     const transitionedPositions = fieldPositions.reduce((a, c) => [...a, [c[0], c[1]+baseFieldSize, c[2]]], []);
@@ -168,10 +170,13 @@ const Scene = props => {
                 onCreated={({ gl }) => {
                 gl.sortObjects = false;
             }}>
-            <Controls focusPosition={focusPosition}/>
+            <Controls 
+                focusPosition={focusPosition}/>
             <ambientLight/>
-            <SceneLight focusPosition={focusPosition} baseFieldSize={baseFieldSize}/>
-            <Pedestal 
+            <SceneLight 
+                focusPosition={focusPosition} 
+                baseFieldSize={baseFieldSize}/>
+            <Pedestal
                 pedestalSize={pedestalSize} 
                 fieldElementSize={fieldElementSize} 
                 masterBasePosition={masterBasePosition} 

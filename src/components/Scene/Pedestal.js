@@ -6,7 +6,6 @@ import * as THREE from 'three';
 const Pedestal = props => {
     const { pedestalSize, fieldElementSize, masterBasePosition, setStackOpacity } = props;
     const isMounted = useRef(false);
-    const isEntered = useRef(false);
 
     const vertexShader = `
         attribute float alphaValue;
@@ -36,24 +35,27 @@ const Pedestal = props => {
     ]);
 
     // Display Config
-    const [pedestalPosition, setPedestalPosition] = useState([0, -50, 0]);
+    const [pedestalConfig, setPedestalConfig] = useState({
+        ready: false,
+        pedestalPosition: [0, 0, 0]
+    })
+    const { ready, pedestalPosition } = pedestalConfig;
 
     useEffect(() => {
-        if(fieldElementSize[1]) setPedestalPosition([
-            pedestalPosition[0], 
-            masterBasePosition[1] - pedestalSize[1]*0.55 - fieldElementSize[1]/2, 
-            pedestalPosition[2]
-        ]);
-    }, [fieldElementSize]);
+        if(fieldElementSize[1]) {
+            setPedestalConfig({
+                ready: true,
+                pedestalPosition: [0, masterBasePosition[1] - pedestalSize[1]*0.55 - fieldElementSize[1]/2, 0]
+            });
+        }
+    }, [...fieldElementSize]);
 
     const aProps = useSpring({
-        pPosition: pedestalPosition,
-        pSize: pedestalSize,
+        pPosition: ready ? pedestalPosition : [0, -50, 0],
+        pSize: ready ? pedestalSize : [0, 0, 0],
         onRest: () => {
-            if(isMounted.current && !isEntered.current) {
+            if(ready && !isMounted.current) {
                 setStackOpacity(1);
-                isEntered.current = true;
-            } else {
                 isMounted.current = true;
             }
         }

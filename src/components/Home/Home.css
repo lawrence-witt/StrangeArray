@@ -9,6 +9,8 @@
 }
 
 .title {
+    cursor: default;
+    user-select: none;
     color: white;
     margin-top: 1rem;
     text-align: center;

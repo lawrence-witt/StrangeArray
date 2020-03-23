@@ -10,9 +10,9 @@ import IndexMarker from './IndexMarker';
 
 const PrimCube = props => {
     // Parent props
-    const {element, index, position, size, opacity, path, groupSelected, parentOverridden, inActiveField, inTopField, font, layerGapFactor} = props;
+    const {element, index, position, size, opacity, path, parentOverridden, inActiveField, inTopField, font, layerGapFactor} = props;
     // Redux Props
-    const {view, editorState, pendingDeletion, hoverActive, focussedElement, pendingSwap} = props;
+    const {view, editorState, pendingDeletion, hoverActive, focussedElement, pendingSwap, transitionActive} = props;
     // Redux Actions
     const {setHover, focusElement, setEditorState, prepForDeletion, prepForSwap} = props;
 
@@ -158,7 +158,7 @@ const PrimCube = props => {
             <boxBufferGeometry attach="geometry" args={[1, 1, 1]}/>
             <a.meshPhongMaterial attach="material" transparent color={cubeColor} opacity={aProps.cOpacity}/>
             
-            {displayState === 'topLayer' && groupSelected && view !== 'home' ? (
+            {!transitionActive && displayState === 'topLayer' && view !== 'home' ? (
                 <IndexMarker layerGapFactor={layerGapFactor} inTopField={inTopField} font={font} index={index}/>
             ) : null}
 
@@ -172,7 +172,8 @@ const mapStateToProps = state => ({
     hoverActive: state.view.hoverActive,
     focussedElement: state.view.focussedElement,
     pendingDeletion: state.view.pendingDeletion,
-    pendingSwap: state.view.pendingSwap
+    pendingSwap: state.view.pendingSwap,
+    transitionActive: state.view.transitionActive
 });
 
 PrimCube.propTypes = {

@@ -13,7 +13,7 @@ const ArrayCube = props => {
     // Parent Props
     let { element, position, size, opacity, path, stackHandler, setGroupPosition, parentSelected, inActiveRoots, inActiveField, inTopField, isOverridden, layerGapFactor, font, index } = props;
     // Redux Props
-    let { view, hoverActive, pendingDeletion, pendingSwap, editorState } = props;
+    let { view, hoverActive, pendingDeletion, pendingSwap, editorState, transitionActive } = props;
     // Redux Actions
     let { setHover, setEditorState, prepForDeletion, prepForSwap, unfocusElements } = props;
 
@@ -152,7 +152,7 @@ const ArrayCube = props => {
                 <a.lineBasicMaterial color="white" transparent opacity={aProps.cOpacity} attach="material"/>
             </lineSegments>
             
-            {displayState !== 'overridden' && parentSelected && view !== 'home' ? (
+            {!transitionActive && parentSelected && displayState !== 'overridden' && view !== 'home' ? (
                 <IndexMarker layerGapFactor={layerGapFactor} inTopField={inTopField} font={font} index={index}/>
             ) : null}
         </a.mesh>
@@ -165,8 +165,7 @@ const mapStateToProps = state => ({
     hoverActive: state.view.hoverActive,
     pendingDeletion: state.view.pendingDeletion,
     pendingSwap: state.view.pendingSwap,
-
-    layerPadPerc: state.stack.layerPadPerc
+    transitionActive: state.view.transitionActive
 });
 
 ArrayCube.propTypes = {
