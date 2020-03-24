@@ -29,10 +29,6 @@ const CubeGroup = props => {
     const { defaultPositions, raisedPositions, cubeElementSize } = getCubeData(groupArray, position, size, unitPadPerc);
     const { fieldPositions, fieldElementSize, newFieldOffset } = getFieldData(newFieldDim, masterBasePosition, baseFieldSize, unitPadPerc, position, size, parentFieldOffset, layerPadPerc);
 
-    useEffect(() => {
-        console.log(newFieldDim);
-    }, [newFieldDim]);
-
 
     // Internal State
     const [inActiveField, inTopField, inActiveRoots, isTopRoot, isOverridden] = useCubeGroup(activeFieldElements, topFieldLayer, activeRoots, topRoot, path, parentOverridden);

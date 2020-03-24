@@ -21,54 +21,36 @@ import { getBaseFieldData } from '../../utils/Calculator';
 
 extend({ OrbitControls });
 
-const Controls = props => {
-    const focusPoint = props.focusPosition[1];
+const Controls = ({focusPoint}) => {
     const { camera, gl } = useThree();
     const orbitRef = useRef();
 
-    const [ targetY, setTargetY ] = useState(focusPoint);
-    const [ prevTargetY, setPrevTargetY ] = useState(targetY);
-
-    const [ positionY, setPositionY ] = useState(camera.position.y);
-    const [ refocusActive, setRefocusActive ] = useState(false);
-
-    useEffect(() => {
-        camera.position.set(5, 5, 7);
-    }, [])
-
-    useEffect(() => {
-        setPrevTargetY(targetY);
-        setTargetY(focusPoint);
-        setPositionY(camera.position.y);
-    }, [focusPoint]);
-
-    useEffect(() => {
-        if(targetY !== prevTargetY) {
-            setRefocusActive(true);
-        }
-    }, [targetY])
-
-    const { targetSpring } = useSpring({
-      from: { targetSpring: prevTargetY },
-      targetSpring: targetY
+    const [positionY, setPositionY] = useState({
+        active: false,
+        curr: 0,
+        next: 0
     })
 
-    const { positionSpring } = useSpring({
-        from: { positionSpring: positionY },
-        positionSpring: targetY,
-        onRest: () => {
-            setRefocusActive(false);
-        }
+    useEffect(() => {
+        setPositionY({active: true, curr: camera.position.y, next: focusPoint})
+    }, [focusPoint]);
+
+    const { targetSpring } = useSpring({
+      targetSpring: focusPoint
     });
   
     useFrame(() => {
-        if (orbitRef.current.target.y !== targetY) {
+        if (orbitRef.current.target.y !== focusPoint) {
             orbitRef.current.target.y = targetSpring.value;
         };
 
-        if (camera.position.y < targetY && refocusActive) {
-            camera.position.y = positionSpring.value
-        };
+        if (camera.position.y < positionY.next && positionY.active) {
+            setPositionY({...positionY, curr: positionY.curr + 0.25});
+            camera.position.y = positionY.curr;
+        } else if(camera.position.y > positionY.next && positionY.active) {
+            setPositionY({...positionY, active: false});
+        } else if(camera.position.y < -2) camera.position.y = -2;
+        
         orbitRef.current.update()
     })
   
@@ -167,11 +149,12 @@ const Scene = props => {
     return (
         <div className={`canvas-container ${hoverActive ? 'hovered' : ''}`}>
             <Canvas
+                camera={{position: [5, 5, 7]}}
                 onCreated={({ gl }) => {
                 gl.sortObjects = false;
             }}>
             <Controls 
-                focusPosition={focusPosition}/>
+                focusPoint={focusPosition[1]}/>
             <ambientLight/>
             <SceneLight 
                 focusPosition={focusPosition} 
