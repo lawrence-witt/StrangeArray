@@ -1,8 +1,8 @@
 import React from 'react';
 import { a, useSpring } from 'react-spring';
 
-import back from '../../../../assets/svgs/back.svg';
-import checkmark from '../../../../assets/svgs/checkmark.svg';
+import Back from '../../../../assets/svgs/Back';
+import Checkmark from '../../../../assets/svgs/Checkmark';
 
 import ArraySelector from './Selectors/ArraySelector';
 import ObjectSelector from './Selectors/ObjectSelector';
@@ -107,17 +107,15 @@ const InputSelector = props => {
                     setDataModel={setDataModel}/> 
             : null}
             <div className="input-button-container">
-                <img 
+                <Back 
                     className="input-button"
-                    src={back} 
                     onClick={() => {
                         setModalStage('typeSelector');
                         setInputError({...inputError, active: false});
-                    }}></img>
-                <img 
+                    }}/>
+                <Checkmark 
                     className="input-button"
-                    src={checkmark} 
-                    onClick={() => currentValidator()}></img>
+                    onClick={() => currentValidator()}/>
             </div>
         </a.div>
     )

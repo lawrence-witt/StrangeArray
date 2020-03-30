@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { a } from 'react-spring';
 
 import './UploadModal.css';
-import checkmark from '../../../assets/svgs/checkmark.svg';
+import Checkmark from '../../../assets/svgs/Checkmark';
 import ErrorExtension from '../../ErrorExtension/ErrorExtension';
 import { useModal } from '../../../utils/CustomHooks';
 import { setCustomUserArray } from '../../../redux/actions/stackActions';
@@ -56,10 +56,9 @@ const UploadModal = props => {
                 <textarea className="upload-input" onChange={e => setUserInput(e.target.value)}></textarea>
 
                 <div className="upload-button-container">
-                    <img 
-                        className="swap-button"
-                        src={checkmark} 
-                        onClick={validateAndSubmit}></img>
+                    <Checkmark 
+                        className="upload-button"
+                        onClick={validateAndSubmit}/>
                 </div>
 
             </div>

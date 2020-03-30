@@ -1,5 +1,5 @@
 // Dependencies
-import React, { useState, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { Provider } from 'react-redux';
 
 // Imported Sheets

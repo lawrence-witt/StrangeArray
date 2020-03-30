@@ -1,58 +1,40 @@
 // Dependencies
-import React, { useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef, useMemo} from 'react';
 import { useSpring, a } from 'react-spring/three';
+import { useLoader } from 'react-three-fiber';
 import * as THREE from 'three';
 
+import graniteNormal from '../../assets/textures/graniteNormal.jpg';
+
 const Pedestal = props => {
-    const { pedestalSize, fieldElementSize, masterBasePosition, setStackOpacity } = props;
+    const { pedestalSize, fieldElementSize, maxY, setStackOpacity } = props;
     const isMounted = useRef(false);
 
-    const vertexShader = `
-        attribute float alphaValue;
-        varying float vAlphaValue;
-
-        void main()	{
-            vAlphaValue = alphaValue;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-        }
-    `
-
-    const fragmentShader = `
-        varying float vAlphaValue;
-
-        void main() {
-            gl_FragColor = vec4( vec3( 0.46, 0.53, 0.6 ), vAlphaValue );
-        }
-    `
-
-    const alphaArray = new Float32Array([
-        0.4, 0.4, 0, 0, 
-        0.4, 0.4, 0, 0,     
-        1, 1, 1, 1,
-        0, 0, 0, 0,
-        0.4, 0.4, 0, 0,      
-        0.4, 0.4, 0, 0,   
-    ]);
+    const normal = useLoader(THREE.TextureLoader, graniteNormal);
+    normal.wrapS = THREE.RepeatWrapping;
+    normal.wrapT = THREE.RepeatWrapping;
+    normal.repeat.set(1, 1.5);
 
     // Display Config
     const [pedestalConfig, setPedestalConfig] = useState({
         ready: false,
-        pedestalPosition: [0, 0, 0]
-    })
-    const { ready, pedestalPosition } = pedestalConfig;
+        configPosition: [0, 0, 0]
+    });
+    const { ready, configPosition } = pedestalConfig;
+    const color = useMemo(() => new THREE.Color('darkslategrey'), []);
 
     useEffect(() => {
         if(fieldElementSize[1]) {
             setPedestalConfig({
                 ready: true,
-                pedestalPosition: [0, masterBasePosition[1] - pedestalSize[1]*0.55 - fieldElementSize[1]/2, 0]
+                configPosition: [0, maxY, 0]
             });
         }
     }, [...fieldElementSize]);
 
-    const aProps = useSpring({
-        pPosition: ready ? pedestalPosition : [0, -50, 0],
-        pSize: ready ? pedestalSize : [0, 0, 0],
+    const pedestal = useSpring({
+        position: ready ? configPosition : [0, -50, 0],
+        size: ready ? pedestalSize : [0, 0, 0],
         onRest: () => {
             if(ready && !isMounted.current) {
                 setStackOpacity(1);
@@ -63,25 +45,18 @@ const Pedestal = props => {
 
     return (
         <a.mesh
-          position={aProps.pPosition}
-          scale={aProps.pSize}>
-            <boxBufferGeometry attach="geometry" args={[1, 1, 1]}>
-                <bufferAttribute 
-                    attachObject={['attributes', 'alphaValue']}
-                    array={alphaArray}
-                    itemSize={1}
-                />
-            </boxBufferGeometry>
-
-            <shaderMaterial
+          position={pedestal.position}
+          scale={pedestal.size}>
+            <boxBufferGeometry attach="geometry" args={[1, 1, 1]}/>
+            <meshStandardMaterial 
+                metalness={0.2} 
+                roughness={0.3} 
                 attach="material"
-                side={THREE.DoubleSide}
-                transparent={true}
-                depthTest={false}
-                vertexShader={vertexShader}
-                fragmentShader={fragmentShader}/>
+                normalMap={normal}
+                normalScale={[0.5, 0.5]}
+                color={color} 
+                transparent/>
         </a.mesh>
-        
     )
 }
 

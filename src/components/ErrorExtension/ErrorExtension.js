@@ -2,7 +2,7 @@ import React from 'react';
 import { a, useSpring } from 'react-spring';
 
 import './ErrorExtension.css';
-import close from '../../assets/svgs/close.svg';
+import Close from '../../assets/svgs/Close';
 
 const ErrorExtension = props => {
     const { errorObject, errorSetter } = props;
@@ -18,10 +18,9 @@ const ErrorExtension = props => {
                 <p className="error-message">{message}</p>
             </div>
             <div className="error-button-container">
-                <img 
+                <Close 
                     className="error-close"
-                    src={close} 
-                    onClick={() => errorSetter({active: false, message})}></img>
+                    onClick={() => errorSetter({active: false, message})}/>
             </div>
         </a.div>
     )

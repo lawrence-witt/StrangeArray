@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import './SwapModal.css';
-import checkmark from '../../../assets/svgs/checkmark.svg';
+import Checkmark from '../../../assets/svgs/Checkmark';
 import { useModal } from '../../../utils/CustomHooks';
 import { resetSwap } from '../../../redux/actions/viewActions';
 import { swapStack } from '../../../redux/actions/stackActions';
@@ -51,10 +51,9 @@ const SwapModal = props => {
             
             <div className="swap-button-container">
                 {pendingSwap[0].element.type && pendingSwap[1].element.type ? (
-                    <img 
+                    <Checkmark 
                         className="swap-button"
-                        src={checkmark} 
-                        onClick={handleSwap}></img>
+                        onClick={handleSwap}/>
                 ) : null}
             </div>
         </a.div>

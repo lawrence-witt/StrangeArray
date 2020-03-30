@@ -1,5 +1,5 @@
 /* Dependencies */
-import React, { useMemo, useState, useEffect} from 'react';
+import React, { useMemo, useState, useEffect, Suspense} from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useSpring, a } from 'react-spring/three';
@@ -159,7 +159,9 @@ const PrimCube = props => {
             <a.meshPhongMaterial attach="material" transparent color={cubeColor} opacity={aProps.cOpacity}/>
             
             {!transitionActive && displayState === 'topLayer' && view !== 'home' ? (
-                <IndexMarker layerGapFactor={layerGapFactor} inTopField={inTopField} font={font} index={index}/>
+                <Suspense fallback={null}>
+                    <IndexMarker layerGapFactor={layerGapFactor} inTopField={inTopField} font={font} index={index}/>
+                </Suspense>
             ) : null}
 
         </a.mesh>

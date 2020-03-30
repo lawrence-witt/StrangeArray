@@ -1,11 +1,9 @@
 export const getBaseFieldData = (fieldDim, masterBasePosition, baseFieldSize, unitPadPerc) => {
-    // The length of one size of a field unit
-    let cubeUnitLength = baseFieldSize/fieldDim;
     // The size of each unit on the field
-    let cubeUnitSize = new Array(3).fill(cubeUnitLength);
+    let cubeUnitSize = new Array(3).fill(baseFieldSize/fieldDim);
 
     // Calculate the position of each possible Cube on a 2D plane
-    let constructors = getConstructors(baseFieldSize, fieldDim, cubeUnitLength);
+    let constructors = getConstructors(baseFieldSize, fieldDim);
     let fieldPositions = applyConstructors(masterBasePosition.slice(), constructors, true);
 
     // Apply 'padding' to each cube on the field
@@ -15,14 +13,12 @@ export const getBaseFieldData = (fieldDim, masterBasePosition, baseFieldSize, un
 }
 
 export const getFieldData = (fieldDim, masterBasePosition, baseFieldSize, unitPadPerc, position, size, parentFieldOffset, layerPadPerc) => {
-    // The length of one size of a field unit
-    let cubeUnitLength = baseFieldSize/fieldDim;
     // The size of each unit on the field
-    let cubeUnitSize = new Array(3).fill(cubeUnitLength);
+    let cubeUnitSize = new Array(3).fill(baseFieldSize/fieldDim);
 
     // Calculate the position of each possible Cube on a 2D plane
-    let constructors = getConstructors(baseFieldSize, fieldDim, cubeUnitLength);
-    let rawFieldPositions = applyConstructors(masterBasePosition.slice(), constructors, true);
+    let constructors = getConstructors(baseFieldSize, fieldDim);
+    let rawFieldPositions = applyConstructors(masterBasePosition, constructors, true);
     
     // Apply 'padding' to each cube on the field
     let fieldElementSize = cubeUnitSize.map(side => side - side*unitPadPerc);
@@ -40,14 +36,12 @@ export const getCubeData = (array, position, size, padPerc) => {
     // Dimensions of the CubeGroup expressed as single number (e.g. 2 for 2x2x2)
     let cubeDim = Math.ceil(Math.cbrt(array.length));
 
-    // The length of one side of a cube unit
-    let cubeUnitLength = cubeLength/cubeDim;
     // The size of each unit inside the cube
-    let cubeUnitSize = new Array(3).fill(cubeUnitLength); 
+    let cubeUnitSize = new Array(3).fill(cubeLength/cubeDim); 
 
     // Calculate the position of each possible Cube within the CubeGroup
-    let constructors = getConstructors(cubeLength, cubeDim, cubeUnitLength);
-    let newPositions = applyConstructors(position.slice(), constructors, false)
+    let constructors = getConstructors(cubeLength, cubeDim);
+    let newPositions = applyConstructors(position, constructors, false)
     let defaultPositions = newPositions.slice().sort((a, b) => a[1] - b[1]);
 
     // Positions of the cubes adjusted for next layer
@@ -75,8 +69,9 @@ function compensateFieldPositions(fieldPositions, position, size, fieldElementSi
 
 // Returns an array of zeroed vertices which denote the center points
 // of any child elements contained within a CubeGroup
-// Example: (4, 2, 2) returns [-1, 1] 
-function getConstructors(cubeLength, cubeDim, cubeUnitLength) {
+// Example: (6, 2) returns [-2, 0, 2] 
+export function getConstructors(cubeLength, cubeDim) {
+    const cubeUnitLength = cubeLength/cubeDim;
     let containers = [];
     for (let i=0; i<=cubeDim; i++) {
         containers.push(cubeUnitLength*i);
@@ -94,7 +89,10 @@ function getConstructors(cubeLength, cubeDim, cubeUnitLength) {
 // [0, 1, 0] to [2, 1, 2]
 // 3D Example: ([1, 1, 1], [-1, 1], false) returns an array of 8 elements ranging from
 // [0, 0, 0] to [2, 2, 2]
-function applyConstructors(position, constructors, twoDims) {
+export function applyConstructors(position, constructors, twoDims) {
+    position = position.slice();
+    constructors = constructors.slice();
+
     let newPositions = [];
     let [ posMemo ] = position.slice(1, 2);
     if(twoDims) position.splice(1, 1);

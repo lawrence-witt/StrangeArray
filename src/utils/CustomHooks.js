@@ -7,7 +7,20 @@ export function usePrevious(value) {
       ref.current = value;
     });
     return ref.current;
-}
+};
+
+export function useDebounce(value, delay) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value]);
+    return debouncedValue;
+};
 
 export function useCubeGroup(activeFieldElements, topFieldLayer, activeRoots, topRoot, path, parentOverridden) {
     const inActiveField = useMemo(() => activeFieldElements.some(el => el.join(',') === path.join(',')), [activeFieldElements]);
@@ -17,7 +30,7 @@ export function useCubeGroup(activeFieldElements, topFieldLayer, activeRoots, to
     const isOverridden = parentOverridden || (inActiveField && !inTopField && !inActiveRoots);
 
     return [inActiveField, inTopField, inActiveRoots, isTopRoot, isOverridden];
-}
+};
 
 export function useModal(opened, mountFuncs, unmountFuncs, customAnimation) {
     const [modalActive, setModalActive] = useState(false);
@@ -46,4 +59,4 @@ export function useModal(opened, mountFuncs, unmountFuncs, customAnimation) {
     }));
 
     return [modalActive, modalSpring];
-}
+};

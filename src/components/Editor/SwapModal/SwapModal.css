@@ -74,12 +74,13 @@
     .swap-button {
         cursor: pointer;
         height: 1.3rem;
-        filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(276deg) brightness(106%) contrast(102%);
-        transition: filter 0.5s;
-        border: 2px solid black;
+        fill: white;
+        transition: fill 0.5s, border-color 0.5s;
+        border: 2px solid white;
         border-radius: 50px;
     }
 
     .swap-button:hover {
-        filter: invert(18%) sepia(82%) saturate(3888%) hue-rotate(338deg) brightness(86%) contrast(100%);
+        fill: red;
+        border-color: red;
     }

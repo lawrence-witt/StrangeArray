@@ -3,12 +3,13 @@ import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import './Editor.css';
-import plus from '../../assets/svgs/plus.svg';
-import minus from '../../assets/svgs/minus.svg';
-import swap from '../../assets/svgs/swap.svg';
-import download from '../../assets/svgs/download.svg';
-import sliders from '../../assets/svgs/sliders.svg';
-import back from '../../assets/svgs/back.svg';
+import Plus from '../../assets/svgs/Plus';
+import Minus from '../../assets/svgs/Minus';
+import Swap from '../../assets/svgs/Swap';
+import Download from '../../assets/svgs/Download';
+import Sliders from '../../assets/svgs/Sliders';
+import Back from '../../assets/svgs/Back';
+
 import AddModal from './AddModal/AddModal';
 import DeleteModal from './DeleteModal/DeleteModal';
 import FocusModal from './FocusModal/FocusModal';
@@ -30,8 +31,7 @@ const Editor = props => {
     }, []);
 
     // Modal Handler
-    const modalHandler = e => {
-        const mode = e.target.name;
+    const modalHandler = mode => {
         if(mode === 'download') setRawUserArray();
         setEditorState(mode);
     }
@@ -56,39 +56,26 @@ const Editor = props => {
             <ControlsModal opened={editorState.controls}/>
             <FocusModal opened={editorState.focus}/>
             <a.section className="e-buttons" style={buttonSpring}>
-                <img 
-                    className={`e-button ${editorState.add ? 'selected' : ''}`} 
-                    src={plus} 
-                    name="add"
-                    onClick={modalHandler}></img>
-                <img 
-                    className={`e-button ${editorState.remove ? 'selected' : ''}`} 
-                    src={minus} 
-                    name="remove"
-                    onClick={modalHandler}></img>
-                <img 
-                    className={`e-button ${editorState.swap ? 'selected' : ''}`} 
-                    src={swap} 
-                    name="swap"
-                    onClick={modalHandler}></img>
-                <img 
+                <Plus 
+                    className={`e-button ${editorState.add ? 'selected' : ''}`}
+                    onClick={() => modalHandler('add')}/>
+                <Minus 
+                    className={`e-button ${editorState.remove ? 'selected' : ''}`}
+                    onClick={() => modalHandler('remove')}/>
+                <Swap 
+                    className={`e-button ${editorState.swap ? 'selected' : ''}`}
+                    onClick={() => modalHandler('swap')}/>
+                <Download 
                     className={`e-button ${editorState.download ? 'selected' : ''}`} 
-                    src={download} 
-                    name="download"
-                    onClick={modalHandler}></img>
-                <img 
-                    className={`e-button ${editorState.controls ? 'selected' : ''}`} 
-                    src={sliders} 
-                    name="controls"
-                    onClick={modalHandler}></img>
-                <img 
-                    className={`e-button`} 
-                    src={back} 
-                    name="delete"
+                    onClick={() => modalHandler('download')}/>
+                <Sliders 
+                    className={`e-button ${editorState.controls ? 'selected' : ''}`}
+                    onClick={() => modalHandler('controls')}/>
+                <Back 
+                    className={'e-button'} 
                     onClick={e => {
                         exitHandler();
-                        e.target.classList.add('selected');
-                    }}></img>
+                        e.target.classList.add('selected');}}/>
             </a.section>
         </div>
     )

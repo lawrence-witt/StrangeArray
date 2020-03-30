@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import './DownloadModal.css';
-import copy from '../../../assets/svgs/copy.svg';
+import Copy from '../../../assets/svgs/Copy';
 import { useModal } from '../../../utils/CustomHooks';
 
 const DownloadModal = props => {
@@ -42,10 +42,9 @@ const DownloadModal = props => {
                     <p ref={outputRef} className="array-output">{rawUserArray}</p>
                 </div>
                 <div className="download-button-container">
-                    <img 
-                        className="download-button"
-                        src={copy} 
-                        onClick={copyToClipboard}></img>
+                    <Copy 
+                        className="download-button" 
+                        onClick={copyToClipboard}/>
                 </div>
             </div>
             {notice.active ? <a.p className="copy-notice" style={noticeSpring}>Copied.</a.p> : null}

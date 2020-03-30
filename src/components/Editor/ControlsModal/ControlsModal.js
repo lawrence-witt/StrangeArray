@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
-import { a, useSpring } from 'react-spring';
+import { a } from 'react-spring';
 
 import './ControlsModal.css';
 import { updateUnitPadding, updateLayerPadding } from '../../../redux/actions/stackActions';
-import { useModal } from '../../../utils/CustomHooks';
+import { useModal, useDebounce } from '../../../utils/CustomHooks';
 
 const ControlsModal = props => {
     const { opened } = props;
@@ -14,15 +14,30 @@ const ControlsModal = props => {
     const [modalActive, modalSpring] = useModal(opened, [], [], {});
 
     /* SLIDERS */
+    const [slideState, setSlideState] = useState({
+        unit: null,
+        layer: null
+    });
+
+    const debouncedUnit = useDebounce(slideState.unit, 250);
+    const debouncedLayer = useDebounce(slideState.layer, 250);
+
     const handleSlider = e => {
         e.stopPropagation();
-        const slideName = e.target.name;
-        const newSlideValue = Number(e.target.value);
 
-        slideName === 'unitPad' ?
-            updateUnitPadding(newSlideValue) :
-            updateLayerPadding(newSlideValue);
-    }
+        setSlideState({
+            ...slideState,
+            [e.target.name]: Number(e.target.value)
+        });
+    };
+
+    useEffect(() => {
+        if(debouncedUnit !== null) updateUnitPadding(debouncedUnit);
+    }, [debouncedUnit]);
+
+    useEffect(() => {
+        if(debouncedLayer != null) updateLayerPadding(debouncedLayer);
+    }, [debouncedLayer]);
 
     return modalActive ? (
         <a.div className="editor-modal controls-modal" style={modalSpring}>
@@ -31,7 +46,7 @@ const ControlsModal = props => {
                 <input 
                     id="unit-pad-input" 
                     type="range" 
-                    name="unitPad" 
+                    name="unit" 
                     min="0.1" 
                     max="0.9" 
                     step="0.01" 
@@ -43,7 +58,7 @@ const ControlsModal = props => {
                 <input 
                     id="layer-pad-input" 
                     type="range" 
-                    name="layerPad" 
+                    name="layer" 
                     min="0" 
                     max="5" 
                     step="0.1" 

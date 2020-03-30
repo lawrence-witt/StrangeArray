@@ -163,12 +163,13 @@
         .input-button {
             cursor: pointer;
             height: 1.3rem;
-            filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(276deg) brightness(106%) contrast(102%);
-            transition: filter 0.5s;
-            border: 2px solid black;
+            fill: white;
+            transition: fill 0.5s, border-color 0.5s;
+            border: 2px solid white;
             border-radius: 50px;
         }
 
         .input-button:hover {
-            filter: unset;
+            fill: unset;
+            border-color: black;
         }

@@ -3,10 +3,10 @@ import { a, useSpring } from 'react-spring';
 import { connect } from 'react-redux';
 
 import './Home.css';
-import plus from '../../assets/svgs/plus.svg';
-import upload from '../../assets/svgs/upload.svg';
-import github from '../../assets/svgs/github-outline.svg';
-import ittLogo from '../../assets/svgs/itt-logo.svg';
+import Plus from '../../assets/svgs/Plus';
+import Upload from '../../assets/svgs/Upload';
+import Github from '../../assets/svgs/Github';
+import IttLogo from '../../assets/svgs/IttLogo';
 import UploadModal from './UploadModal/UploadModal';
 import { startTransition } from '../../redux/actions/viewActions';
 import { setCustomUserArray } from '../../redux/actions/stackActions';
@@ -48,24 +48,22 @@ const Home = props => {
             <a.h1 className="title" style={titleSpring}>strange[Array]</a.h1>
             <UploadModal opened={uploadModal}/>
             <a.section className="h-buttons" style={buttonSpring}>
-                <img 
-                    className={`h-button ${buttonSelect === 'create' ? 'selected' : ''}`} 
-                    src={plus} 
+                <Plus 
+                    className={`h-button ${buttonSelect === 'create' ? 'selected' : ''}`}  
                     onClick={() => {
                         createHandler();
                         setButtonSelect('create');
-                    }}></img>
-                <img 
+                    }}/>
+                <Upload 
                     className={`h-button ${buttonSelect === 'upload' ? 'selected' : ''}`} 
-                    src={upload} 
                     onClick={() => {
                         uploadHandler();
                         buttonSelect === 'upload' ?
                             setButtonSelect('') : 
                             setButtonSelect('upload');
-                    }}></img>
-                <img className="h-button" src={github}></img>
-                <img className="h-button" src={ittLogo}></img>
+                    }}/>
+                <Github className="h-button"/>
+                <IttLogo className="h-button"/>
             </a.section>
         </div>
     )

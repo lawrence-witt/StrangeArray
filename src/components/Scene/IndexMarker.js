@@ -26,7 +26,7 @@ const IndexMarker = props => {
     return (
         <a.mesh position={[-0.5, 0.51, -0.5]} scale={indexSpring.scale}>
             <textGeometry attach="geometry" args={[index, config]}/>
-            <meshBasicMaterial attach="material" color={color}/>
+            <meshBasicMaterial attach="material" color={color} transparent/>
         </a.mesh>
     )
 }

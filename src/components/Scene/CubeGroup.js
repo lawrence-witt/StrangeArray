@@ -1,5 +1,5 @@
 // Dependencies
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import delay from 'delay';
 import PropTypes from 'prop-types';
@@ -9,7 +9,7 @@ import { useSpring, a } from 'react-spring/three';
 
 // Imported Sheets
 import { useCubeGroup } from '../../utils/CustomHooks';
-import { getCubeData, getFieldData } from '../../utils/Calculator';
+import { getCubeData, getFieldData } from '../../utils/GeometryCalculator';
 import ArrayCube from './ArrayCube';
 import PrimCube from './PrimCube';
 import { expandStack, collapseStack, refocusStack } from '../../redux/actions/stackActions';

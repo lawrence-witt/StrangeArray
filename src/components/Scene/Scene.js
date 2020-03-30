@@ -1,107 +1,52 @@
 // Dependencies
-import React, { useRef, useState, useEffect, useMemo} from 'react';
+import React, { useRef, useState, useEffect, useMemo, Suspense} from 'react';
 import { Provider, connect } from 'react-redux';
 import delay from 'delay';
 import PropTypes from 'prop-types';
 
 // Three Dependencies
-import { Canvas, useFrame, useThree, extend, useLoader} from 'react-three-fiber';
-import { useSpring, a } from 'react-spring/three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Canvas, useLoader} from 'react-three-fiber';
 import * as THREE from 'three';
 
 // Imported Sheets
 import store from '../../redux/store';
 import { completeTransition } from '../../redux/actions/viewActions';
+import { getBaseFieldData } from '../../utils/GeometryCalculator';
 
+import SceneLight from './SceneLight';
+import Controls from './Controls';
 import ConnectedCubeGroup from './CubeGroup';
 import PrimCube from './PrimCube';
 import Pedestal from './Pedestal';
-import { getBaseFieldData } from '../../utils/Calculator';
-
-extend({ OrbitControls });
-
-const Controls = ({focusPoint}) => {
-    const { camera, gl } = useThree();
-    const orbitRef = useRef();
-
-    const [positionY, setPositionY] = useState({
-        active: false,
-        curr: 0,
-        next: 0
-    })
-
-    useEffect(() => {
-        setPositionY({active: true, curr: camera.position.y, next: focusPoint})
-    }, [focusPoint]);
-
-    const { targetSpring } = useSpring({
-      targetSpring: focusPoint
-    });
-  
-    useFrame(() => {
-        if (orbitRef.current.target.y !== focusPoint) {
-            orbitRef.current.target.y = targetSpring.value;
-        };
-
-        if (camera.position.y < positionY.next && positionY.active) {
-            setPositionY({...positionY, curr: positionY.curr + 0.25});
-            camera.position.y = positionY.curr;
-        } else if(camera.position.y > positionY.next && positionY.active) {
-            setPositionY({...positionY, active: false});
-        } else if(camera.position.y < -2) camera.position.y = -2;
-        
-        orbitRef.current.update()
-    })
-  
-    return (
-        <orbitControls 
-          args={[camera, gl.domElement]}
-          ref={orbitRef}
-          enableDamping
-        />
-    )
-}
-
-const SceneLight = props => {
-    const { focusPosition, baseFieldSize } = props;
-
-    const aProps = useSpring({
-        spotTarget: focusPosition,
-        spotPosition: [focusPosition[0], focusPosition[1]+baseFieldSize*2, focusPosition[2]]
-    });
-
-    const light = useMemo(() => new THREE.SpotLight(0xffffff, 0.5), []);
-
-    return (
-        <>
-        <a.primitive object={light} position={aProps.spotPosition}/>
-        <primitive object={light.target} position={[0, 0, 0]}/>
-        </>
-    )
-}
+import Pillars from './Pillars';
+import FogPlane from './FogPlane';
+import Stars from './Stars';
 
 const Scene = props => {
     const { view, transitionActive, completeTransition, hoverActive, demoArray, userArray, focusPosition, masterBasePosition, baseFieldSize, unitPadPerc, layerPadPerc, activeRoots} = props;
 
-    // Active array state
+    // Active Array State
     const [currentArray, setCurrentArray] = useState(demoArray);
 
-    // Position/size config
-    const pedestalSize = useMemo(() => [baseFieldSize, baseFieldSize*1.5, baseFieldSize], [baseFieldSize]);
+    // Base Position/Size Config
     const fieldDim = Math.ceil(Math.sqrt(currentArray.length));
     const { fieldPositions, fieldElementSize } = getBaseFieldData(fieldDim, masterBasePosition, baseFieldSize, unitPadPerc);
     const transitionedPositions = fieldPositions.reduce((a, c) => [...a, [c[0], c[1]+baseFieldSize, c[2]]], []);
     const layerGapFactor = layerPadPerc*(100/fieldElementSize[0]);
 
-    // Internal state
+    // Pedestal/Pillar Config
+    const pedestalSize = useMemo(() => [baseFieldSize, baseFieldSize*1.5, baseFieldSize], [baseFieldSize]);
+    // This is always the centrepoint of the pedestal
+    const maxY = masterBasePosition[1] - pedestalSize[1]*0.55 - fieldElementSize[1]/2;
+
+    // Internal State
     const [stackActive, setStackActive] = useState(true);
     const [stackPosition, setStackPosition] = useState(fieldPositions);
     const [stackOpacity, setStackOpacity] = useState(0);
     const [stackSuspended, setStackSuspended] = useState(false);
     const isMounted = useRef(false);
 
-    // Handle transition between user and demo arrays
+    // Handle Transition Between User And Demo Arrays
     useEffect(() => {
         if(isMounted.current) {
             if(transitionActive) {
@@ -132,7 +77,7 @@ const Scene = props => {
         }
     }, [transitionActive]);
 
-    // Update the stack when array elements change
+    // Update The Stack When Array Elements Change
     useEffect(() => {
         if (view === 'edit'){
             setCurrentArray(userArray);
@@ -149,21 +94,30 @@ const Scene = props => {
     return (
         <div className={`canvas-container ${hoverActive ? 'hovered' : ''}`}>
             <Canvas
-                camera={{position: [5, 5, 7]}}
+                camera={{position: [6, -4, 15]}}
                 onCreated={({ gl }) => {
                 gl.sortObjects = false;
             }}>
             <Controls 
                 focusPoint={focusPosition[1]}/>
             <ambientLight/>
+            <fogExp2 attach="fog" args={["black", 0.0175]}/>
+            <Stars />
+            <Suspense fallback={null}>
+                <FogPlane maxY={maxY}/>
+                <Pillars
+                pedestalSize={pedestalSize}
+                maxY={maxY}/>
+                <Pedestal
+                pedestalSize={pedestalSize}
+                maxY={maxY}
+                fieldElementSize={fieldElementSize}
+                setStackOpacity={setStackOpacity}/>
+            </Suspense>
             <SceneLight 
                 focusPosition={focusPosition} 
                 baseFieldSize={baseFieldSize}/>
-            <Pedestal
-                pedestalSize={pedestalSize} 
-                fieldElementSize={fieldElementSize} 
-                masterBasePosition={masterBasePosition} 
-                setStackOpacity={setStackOpacity}/>
+            
             <Provider store={store}>
             {stackSuspended ? null : currentArray.map((lowerElement, i) => {
                 return !stackPosition[i] ? null : Array.isArray(lowerElement) ? (

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import './DeleteModal.css';
-import checkmark from '../../../assets/svgs/checkmark.svg';
+import Checkmark from '../../../assets/svgs/Checkmark';
 import { useModal } from '../../../utils/CustomHooks';
 import { resetDeletion } from '../../../redux/actions/viewActions';
 import { removeFromStack } from '../../../redux/actions/stackActions';
@@ -31,10 +31,9 @@ const DeleteModal = props => {
                 <p className="element-content">{content}</p>
             </div>
             <div className="delete-button-container">
-                <img 
+                <Checkmark 
                     className="delete-button"
-                    src={checkmark} 
-                    onClick={removeFromStack}></img>
+                    onClick={removeFromStack}/>
             </div>
             </>
             ): null}
