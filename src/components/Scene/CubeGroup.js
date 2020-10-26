@@ -45,7 +45,7 @@ const CubeGroup = props => {
 
 
     /* RESPOND TO PARENT COMPONENT CHANGES */
-    // Persist new positions/size when config changes
+    // Persist changes to position/size config
     useEffect(() => {
         setGroupPosition(position);
         if(!editorState.controls){
@@ -178,6 +178,7 @@ const CubeGroup = props => {
                         key={nextFieldPaths[i].join(',')}/>
                 )
             })}
+            
         </a.mesh>
     )
 }

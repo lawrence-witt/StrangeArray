@@ -25,7 +25,7 @@ export default function Pillars({pedestalSize, maxY}) {
         return nextPositions;
     }, [maxY]);
 
-    // Max height and position of each pillar in relation to its group
+    // Max height, and position of each pillar in relation to its group
     const pillarSize = [pGSize[0]/pGDim, pGSize[1], pGSize[2]/pGDim];
     const pillarPositions = useMemo(() => {
         return pGPositions.map(pGroup => {
@@ -34,7 +34,7 @@ export default function Pillars({pedestalSize, maxY}) {
         }).reduce((a, c) => a.concat(c));
     }, [pGPositions]); 
 
-    // Weight the height of each pillar by distance from the pedestal
+    // Weight the height of each pillar by distance from the pedestal, add randomness
     const pillarWeightGroups = useMemo(() => initialiseGroupWeights(groupGrid), []);
     const appliedPillarWeights = useMemo(() => {
         return pillarWeightGroups.map(pillarGroup => {

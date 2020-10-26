@@ -71,7 +71,7 @@ export default function FogPlane({maxY}) {
         });
         fogRef1.current.rotation.z = one.rotation;
         fogRef2.current.rotation.z = two.rotation;
-    })
+    });
 
     return (
         <mesh>
@@ -89,21 +89,4 @@ export default function FogPlane({maxY}) {
         </a.mesh>
         </mesh>
     )
-}
-
-/* let newRising;
-
-        if(rising) {
-            if(two.position + 0.001 > yPosition + 5) {
-                newRising = false;
-            } else {
-                newRising = true;
-            }
-        } else {
-            if(three.position - 0.001 < yPosition - 0.2) {
-                newRising = true;
-            } else {
-                newRising = false;
-            }
-        };
- */
+};

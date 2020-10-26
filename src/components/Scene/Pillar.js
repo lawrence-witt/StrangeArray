@@ -12,6 +12,7 @@ export default function Pillar({position, scale, smallest, texture}) {
 
     const [ready, setReady] = useState(false);
 
+    // Stagger the pillar entrace by a random duration
     useEffect(() => {
         const ran = Math.floor(Math.random()*500);
         const timer = setTimeout(() => {
@@ -30,6 +31,7 @@ export default function Pillar({position, scale, smallest, texture}) {
         return new THREE.Color(`hsl(0, 0%, ${ran}%)`)
     }, []);
 
+    // Give the pillar a random rotation in the group
     const rotation = useMemo(() => {
         const ran = Math.floor(Math.random()*4);
         return ran === 0 

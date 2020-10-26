@@ -28,10 +28,9 @@ export default function SceneLight({focusPosition, baseFieldSize}) {
         <>
             <a.primitive object={topLight} position={aProps.position}/>
             <primitive object={topLight.target} position={[0, 0, 0]}/>
-        
+            
             <primitive object={moveLight} position={moveSpot}/>
             <a.primitive object={moveLight.target} position={aProps.target}/>
-        
         </>
     )
 }

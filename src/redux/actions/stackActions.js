@@ -2,10 +2,13 @@ import {
     UPDATE_UNIT_PADDING,
     UPDATE_LAYER_PADDING,
     REFOCUS_STACK,
+
     SET_CUSTOM_USER_ARRAY,
     SET_RAW_USER_ARRAY,
+
     EXPAND_STACK, 
     COLLAPSE_STACK, 
+
     ADD_TO_STACK, 
     REMOVE_FROM_STACK,
     SWAP_STACK,
@@ -20,14 +23,14 @@ export const updateUnitPadding = newValue => dispatch => {
         type: UPDATE_UNIT_PADDING,
         payload: newValue
     })
-}
+};
 
 export const updateLayerPadding = newValue => dispatch => {
     dispatch({
         type: UPDATE_LAYER_PADDING,
         payload: newValue
     })
-}
+};
 
 export const refocusStack = newFocus => (dispatch, getState) => {
     const currentFocus = getState().stack.focusPosition;
@@ -38,7 +41,7 @@ export const refocusStack = newFocus => (dispatch, getState) => {
         type: REFOCUS_STACK,
         payload: newFocus
     })
-}
+};
 
 export const setCustomUserArray = (customArray, reset=false) => dispatch => {
     const dataModel = (type, content) => ({
@@ -82,7 +85,7 @@ export const setCustomUserArray = (customArray, reset=false) => dispatch => {
             payload: true
         });
     }
-}
+};
 
 export const setRawUserArray = () => (dispatch, getState) => {
     const userArray = getState().stack.userArray.slice();
@@ -111,7 +114,7 @@ export const setRawUserArray = () => (dispatch, getState) => {
         type: SET_RAW_USER_ARRAY,
         payload: unformattedArray
     });
-}
+};
 
 export const expandStack = (newRoot, newFieldElements, newFocus) => (dispatch, getState) => {
     const currentFocus = getState().stack.focusPosition;
@@ -127,7 +130,7 @@ export const expandStack = (newRoot, newFieldElements, newFocus) => (dispatch, g
             newRoot
         }
     });
-}
+};
 
 export const collapseStack = (newRoot, newFieldElements, newFocus) => (dispatch, getState) => {
     const activeFieldElements = getState().stack.activeFieldElements.slice();
@@ -151,7 +154,7 @@ export const collapseStack = (newRoot, newFieldElements, newFocus) => (dispatch,
             topRoot
         }
     });
-}
+};
 
 export const addToStack = newElement => (dispatch, getState) => {
     newElement = newElement.type === 'Array' ? [] : newElement;
@@ -190,7 +193,7 @@ export const addToStack = newElement => (dispatch, getState) => {
             newTopFieldLayer
         }
     });
-}
+};
 
 export const removeFromStack = () => (dispatch, getState) => {
     const pendingDeletion = Object.assign({}, getState().view.pendingDeletion);
@@ -207,11 +210,11 @@ export const removeFromStack = () => (dispatch, getState) => {
             array.splice(idx, 0, next);
         }
         return array;
-    }
+    };
 
     const newUserArray = traverseRemove(pendingDeletion.path, userArray);
     const newActiveFieldElements = activeFieldElements.slice(0, activeFieldElements.length-1);
-    const newTopFieldLayer = topFieldLayer.slice(0, topFieldLayer.length-1)
+    const newTopFieldLayer = topFieldLayer.slice(0, topFieldLayer.length-1);
     
     dispatch({
         type: REMOVE_FROM_STACK,
@@ -225,7 +228,7 @@ export const removeFromStack = () => (dispatch, getState) => {
     dispatch({
         type: RESET_DELETION
     });
-}
+};
 
 export const swapStack = () => (dispatch, getState) => {
     const pendingSwap = Object.assign({}, getState().view.pendingSwap);
@@ -245,7 +248,7 @@ export const swapStack = () => (dispatch, getState) => {
             array.splice(idx, 0, next);
         };
         return array;
-    }
+    };
 
     let newUserArray;
     newUserArray = traverseReplace(pendingSwap[0].path, userArray, pendingSwap[1].element);
@@ -255,4 +258,4 @@ export const swapStack = () => (dispatch, getState) => {
         type: SWAP_STACK,
         payload: newUserArray
     });
-}
+};
