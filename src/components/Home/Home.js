@@ -62,8 +62,8 @@ const Home = props => {
                             setButtonSelect('') : 
                             setButtonSelect('upload');
                     }}/>
-                <Github className="h-button"/>
-                <IttLogo className="h-button"/>
+                <a href="https://github.com/lawrence-witt/StrangeArray" target="_blank" rel="noopener noreferrer"><Github className="h-button"/></a>
+                <a href="https://itt.dev" target="_blank" rel="noopener noreferrer"><IttLogo className="h-button"/></a>
             </a.section>
         </div>
     )

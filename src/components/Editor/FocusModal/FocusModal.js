@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import { a, useSpring } from 'react-spring';
+import { a } from 'react-spring';
 
 import './FocusModal.css';
 import { useModal } from '../../../utils/CustomHooks';
