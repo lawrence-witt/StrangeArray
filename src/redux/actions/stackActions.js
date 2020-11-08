@@ -57,9 +57,7 @@ export const setCustomUserArray = (customArray, reset=false) => dispatch => {
     } else {
         function formatArray(array) {
             return array.map(element => {
-                if(!element) {
-                    return dataModel('Null', null)
-                } else if (Array.isArray(element)) {
+                if (Array.isArray(element)) {
                     return formatArray(element);
                 } else if (element.constructor === Object) {
                     return dataModel('Object', JSON.stringify(element));
@@ -69,9 +67,11 @@ export const setCustomUserArray = (customArray, reset=false) => dispatch => {
                     return dataModel('String', element);
                 } else if (typeof element === 'boolean') {
                     return dataModel('Boolean', element.toString());
+                } else {
+                    return dataModel('Null', null);
                 };
-            })
-        }
+            });
+        };
     
         const formattedArray = formatArray(customArray);
     
