@@ -1,6 +1,6 @@
 /* Imports */
 
-const { exec } = require('child_process');
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -61,12 +61,12 @@ console.log(`New version number is: ${newVersion}.`);
 /* Validate Commit Summary */
 
 const commitSummary = `${newVersion} - ${SUM}`;
+const commitMessage = `${commitSummary}${commitBody ? `\n\n${commitBody}` : ""}`;
 
 if (commitSummary.length > 72) {
     throw new Error(`Commit summaries should be <= 72 characters. Current length including version number: ${commitSummary.length}.`);
 };
 
-const commitMessage = `${commitSummary}${commitBody ? `\n${commitBody}` : ""}`;
 
 /* Update package.json, package-lock.json, meta.json */
 
@@ -91,20 +91,31 @@ Object.keys(updateSchema).forEach(path => {
 });
 
 
-/* Stage and commit all changes with supplied git summary and body */
+/* Stage Changes */
 
-exec("git add -A", error => {
-    if (error) {
-        console.log(`Error staging version changes: ${error.message}.`);
-        return;
-    };
+const {
+    signal: stageSignal, 
+    status: stageStatus,
+    stderr: stageStderr
+} = spawnSync('git', ['add', '-A']);
+
+if (stageSignal || stageStatus) {
+    console.log(`Error staging version changes:  ${stageStderr.toString()}`);
+} else {
     console.log(`Version ${newVersion} changes staged.`);
+};
 
-    exec(`git commit -m $'${commitMessage}'`, error => {
-        if (error) {
-            console.log(`Error committing version changes: ${error.message}.`);
-            return;
-        };
-        console.log(`Version ${newVersion} changes committed.`);
-    });
-});
+
+/* Commit Changes */
+
+const {
+    signal: commitSignal, 
+    status: commitStatus,
+    stderr: commitStderr
+} = spawnSync('git', ['commit', '-m', commitMessage]);
+
+if (commitSignal || commitStatus) {
+    console.log(`Error committing version changes:  ${commitStderr.toString()}`);
+} else {
+    console.log(`Version ${newVersion} changes committed.`);
+};
