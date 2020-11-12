@@ -8,6 +8,8 @@ import * as THREE from 'three';
 import { setHover, prepForDeletion, prepForSwap, focusElement, setEditorState } from '../../redux/actions/viewActions';
 import IndexMarker from './IndexMarker';
 
+import isEventSupported from '../../utils/isEventSupported';
+
 const PrimCube = props => {
     // Parent props
     const {element, index, position, size, opacity, path, parentOverridden, inActiveField, inTopField, font, layerGapFactor} = props;
@@ -153,8 +155,9 @@ const PrimCube = props => {
           position={aProps.cPosition} 
           scale={aProps.cSize} 
           onPointerMove={e => hoverHandler(e, true)} 
-          onPointerOut={e => hoverHandler(e, false)} 
-          onClick={e => primClickHandler(e)}>
+          onPointerOut={e => hoverHandler(e, false)}
+          onClick={e => !isEventSupported('touchstart') && primClickHandler(e)}
+          onPointerDown={e => isEventSupported('touchstart') && primClickHandler(e)}>
             <boxBufferGeometry attach="geometry" args={[1, 1, 1]}/>
             <a.meshPhongMaterial attach="material" transparent color={cubeColor} opacity={aProps.cOpacity}/>
             

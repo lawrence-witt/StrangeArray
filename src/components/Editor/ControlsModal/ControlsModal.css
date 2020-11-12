@@ -3,6 +3,7 @@
     width: 100%;
     max-width: 400px;
     height: 25%;
+    min-height: 175px;
     z-index: 2;
     overflow-x: hidden;
     overflow-y: auto;

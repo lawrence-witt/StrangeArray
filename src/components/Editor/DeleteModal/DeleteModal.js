@@ -15,7 +15,8 @@ const DeleteModal = props => {
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
     const heightProps = {
-        height: type ? '25%' : '0%'
+        height: type ? '25%' : '0%',
+        minHeight: type ? '175px' : '48px'
     };
 
     const [modalActive, modalSpring] = useModal(opened, [resetDeletion], [resetDeletion], heightProps);

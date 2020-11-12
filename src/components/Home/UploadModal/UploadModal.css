@@ -4,6 +4,7 @@
     width: 100%;
     max-width: 400px;
     height: 30%;
+    min-height: 175px;
     z-index: 1;
 }
 

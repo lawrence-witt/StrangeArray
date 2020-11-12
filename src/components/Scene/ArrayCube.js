@@ -9,6 +9,8 @@ import * as THREE from 'three';
 import IndexMarker from './IndexMarker';
 import { setHover, prepForDeletion, prepForSwap, setEditorState, focusElement, unfocusElements } from '../../redux/actions/viewActions';
 
+import isEventSupported from '../../utils/isEventSupported';
+
 const ArrayCube = props => {
     // Parent Props
     let { element, position, size, opacity, path, stackHandler, setGroupPosition, parentSelected, inActiveRoots, inActiveField, inTopField, isOverridden, layerGapFactor, font, index } = props;
@@ -143,7 +145,8 @@ const ArrayCube = props => {
             <mesh
             onPointerMove={e => hoverHandler(e, true)} 
             onPointerOut={e => hoverHandler(e, false)} 
-            onClick={e => arrayClickHandler(e)}>
+            onClick={e => !isEventSupported('touchstart') && arrayClickHandler(e)}
+            onPointerDown={e => isEventSupported('touchstart') && arrayClickHandler(e)}>
                 <boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
                 <meshPhongMaterial attach="material" transparent alphaTest={2}/>
             </mesh>

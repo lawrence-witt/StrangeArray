@@ -14,7 +14,8 @@ const SwapModal = props => {
 
     /* MODAL TRANSITION IN/OUT AND MOUNTING/UNMOUNTING */
     const heightProps = {
-        height: pendingSwap[0].element.type || pendingSwap[1].element.type ? '25%' : '0%'
+        height: pendingSwap[0].element.type || pendingSwap[1].element.type ? '25%' : '0%',
+        minHeight: pendingSwap[0].element.type || pendingSwap[1].element.type ? '175px' : '48px'
     };
 
     const [modalActive, modalSpring] = useModal(opened, [resetSwap], [resetSwap], heightProps);
