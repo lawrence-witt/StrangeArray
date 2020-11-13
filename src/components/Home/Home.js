@@ -45,7 +45,7 @@ const Home = props => {
 
     return (
         <div className="home-container">
-            <a.h1 className="title" style={titleSpring}>strange[Array]</a.h1>
+            <a.h1 className="title" style={titleSpring}>Strange[Array]</a.h1>
             <UploadModal opened={uploadModal}/>
             <a.section className="h-buttons" style={buttonSpring}>
                 <Plus 
